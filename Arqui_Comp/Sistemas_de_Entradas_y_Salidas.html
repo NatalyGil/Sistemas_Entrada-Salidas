@@ -8,7 +8,7 @@
   <!-- Preconnect para CDN -->
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <link rel="preconnect" href="https://cdn.tailwindcss.com">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/quchart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <!-- Librerías Externas -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -1944,12 +1944,12 @@ function animIRQCircles() {
     document.getElementById("irq-circle-5"),
     document.getElementById("irq-circle-6")
   ];
-  const timings = [0, 300, 600, 900, 1200, 1500];
+  const timings = [0, 600, 1200, 1800, 2400, 3000];
   circles.forEach((circle, i) => {
     if (!circle) return;
     setTimeout(() => {
       circle.style.transform = "scale(1.4)";
-      setTimeout(() => { circle.style.transform = "scale(1)"; }, 250);
+      setTimeout(() => { circle.style.transform = "scale(1)"; }, 500);
     }, timings[i]);
   });
 }
