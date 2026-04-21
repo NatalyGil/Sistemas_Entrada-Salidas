@@ -1,0 +1,2300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistemas de Entrada/Salida | Grupo 4 — Arq. de Computadores</title>
+  
+  <!-- Preconnect para CDN -->
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Librerías Externas -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Configuración de Tailwind -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 400: '#60cdff', 500: '#ffffff', 600: '#ffffff' },
+            glass: 'rgba(27, 38, 55, 0.75)',
+            glassBorder: 'rgba(255, 255, 255, 0.1)',
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          }
+        }
+      }
+    }
+  </script>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body class="text-slate-200">
+
+<!-- Fondo Animado -->
+<canvas id="backgroundCanvas" aria-hidden="true"></canvas>
+
+<div class="max-w-full mx-auto my-4 px-5">
+  <!-- Contenedor Principal -->
+  <div class="glass-panel rounded-2xl overflow-hidden flex flex-col relative w-[95%] mx-auto">
+    
+    <!-- Barra de Progreso -->
+    <div class="w-full h-1.5 bg-slate-800">
+      <div id="main-progress" class="h-full bg-white shadow-[0_0_10px_#0000] transition-all duration-500 w-[12.5%]"></div>
+    </div>
+
+    <!-- Cabecera -->
+    <header class="p-4 md:p-6 flex flex-col md:flex-row justify-between items-center border-b border-white/10 bg-black/40 backdrop-blur-md sticky top-0 z-50">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-black tracking-tight">I/O <span class="text-brand-400">Systems 2026</span></h1>
+        <p class="text-slate-400 mt-1 text-sm">Exposición Interactiva - Grupo 4</p>
+      </div>
+      <div class="mt-2 md:mt-0 px-3 py-1.5 bg-slate-800/80 rounded-full border border-slate-700 font-semibold text-xs">
+        <i class="fas fa-layer-group text-brand-400 mr-1.5"></i><span id="level-indicator">Módulo 1 de 8</span>
+      </div>
+    </header>
+
+    <!-- Navegación Superior -->
+    <nav class="flex overflow-x-auto bg-black/40 border-b border-white/5" aria-label="Navegacion de secciones">
+      <button class="nav-btn active flex-1 py-3.5 px-5 text-slate-400 font-semibold transition-all min-w-[140px] flex flex-col items-center gap-1.5" data-target="intro" role="tab" aria-selected="true" aria-controls="intro">
+        <i class="fas fa-play text-lg"></i> Introducción
+      </button>
+      <button class="nav-btn flex-1 py-3.5 px-5 text-slate-400 font-semibold transition-all min-w-[140px] flex flex-col items-center gap-1.5" data-target="interrupciones" role="tab" aria-selected="false" aria-controls="interrupciones">
+        <i class="fas fa-bolt text-lg"></i> Interrupciones
+      </button>
+      <button class="nav-btn flex-1 py-3.5 px-5 text-slate-400 font-semibold transition-all min-w-[140px] flex flex-col items-center gap-1.5" data-target="dma" role="tab" aria-selected="false" aria-controls="dma">
+        <i class="fas fa-microchip text-lg"></i> DMA
+      </button>
+      <button class="nav-btn flex-1 py-3.5 px-5 text-slate-400 font-semibold transition-all min-w-[140px] flex flex-col items-center gap-1.5" data-target="buses" role="tab" aria-selected="false" aria-controls="buses">
+        <i class="fas fa-network-wired text-lg"></i> Buses
+      </button>
+      <button class="nav-btn flex-1 py-3.5 px-5 text-slate-400 font-semibold transition-all min-w-[140px] flex flex-col items-center gap-1.5" data-target="avances" role="tab" aria-selected="false" aria-controls="avances">
+        <i class="fas fa-rocket text-lg"></i> Avances '26
+      </button>
+
+      <button class="nav-btn flex-1 py-3.5 px-5 text-slate-400 font-semibold transition-all min-w-[140px] flex flex-col items-center gap-1.5" data-target="quiz" role="tab" aria-selected="false" aria-controls="quiz">
+        <i class="fas fa-gamepad text-lg"></i> Quiz Final
+      </button>
+      <button class="nav-btn flex-1 py-3.5 px-5 text-slate-400 font-semibold transition-all min-w-[140px] flex flex-col items-center gap-1.5" data-target="ia" role="tab" aria-selected="false" aria-controls="ia">
+        <i class="fas fa-robot text-lg"></i> IA Asistentes
+      </button>
+    </nav>
+
+    <!-- Contenedor de Secciones -->
+    <div class="p-4 md:p-6 relative">
+
+          <!-- ================= SECCIÓN: INTRODUCCIÓN ================= -->
+      <div id="intro" class="level-content active" role="tabpanel" aria-labelledby="tab-intro">
+            
+            <!-- Hero Section -->
+            <div class="text-center mb-10">
+              <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-4 shadow-lg shadow-blue-500/30">
+                        <i class="fas fa-microchip text-4xl text-white"></i>
+                      </div>
+                      <h2 class="text-4xl font-black mb-3"><span class="text-brand-400">Sistemas I/O</span> 2026</h2>
+                      <p class="text-lg text-slate-400 max-w-2xl mx-auto">Explora los mecanismos que permiten la comunicación entre el procesador y los dispositivos externos</p>
+                    </div>
+
+                    <!-- 1. ¿Qué son los sistemas I/O? -->
+                    <div class="bg-gradient-to-br from-slate-800 to-slate-800/50 p-6 rounded-xl border border-slate-600 mb-8">
+                      <h3 class="text-xl font-semibold text-blue-400 mb-4 flex items-center gap-2">
+                        <i class="fas fa-door-open"></i> ¿Qué son los sistemas de I/O?
+                      </h3>
+                      <p class="text-slate-300 leading-relaxed mb-4">
+                        Los <strong>sistemas de Entrada/Salida (I/O)</strong> son los mecanismos que permiten la comunicación entre el procesador (CPU) y los dispositivos externos como teclados, pantallas, discos duros, redes y más.
+                      </p>
+                      <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                        Constituyen un componente esencial en la arquitectura de computadores. A través de mecanismos como interrupciones, acceso directo a memoria (DMA) y buses de comunicación, se garantiza una transferencia eficiente de datos y una adecuada gestión de los recursos del sistema.
+                      </p>
+                      <p class="text-slate-400 text-sm leading-relaxed">
+                        Un sistema de I/O está formado por <strong>hardware</strong> (controladores, buses, puertos), <strong>firmware</strong> (drivers embebidos) y <strong>software</strong> (sistema operativo). Cada dispositivo tiene un <strong>controlador</strong> que actúa como intermediario entre el dispositivo y la CPU.
+                      </p>
+                    </div>
+
+                    <!-- 2. ¿Por qué es importante? -->
+                    <div class="bg-gradient-to-r from-blue-900/40 via-purple-900/40 to-blue-900/40 p-6 rounded-xl border border-blue-500/30 mb-8">
+                      <h3 class="text-xl font-semibold text-brand-400 mb-3 flex items-center gap-2">
+                        <i class="fas fa-lightbulb"></i> ¿Por qué es importante?
+                      </h3>
+                      <p class="text-slate-300 leading-relaxed mb-3">
+                        Los sistemas de entrada/salida son fundamentales porque <strong class="text-yellow-400">determinan la eficiencia</strong> con la que se comunican los componentes del computador, <strong class="text-yellow-400">influyendo directamente en el rendimiento general</strong>.
+                      </p>
+                      <p class="text-slate-300 leading-relaxed">
+                        Una CPU puede ser extremadamente rápida, pero si los sistemas de I/O son lentos, el cuello de botella impedirá que el usuario note los beneficios de ese procesador potente. Esto es especialmente crítico en entornos modernos como la inteligencia artificial y los centros de datos.
+                      </p>
+                    </div>
+
+                    <!-- 3. Evolución histórica -->
+                    <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-600 mb-8">
+                      <h3 class="text-lg font-semibold text-purple-400 mb-4 flex items-center gap-2">
+                        <i class="fas fa-history"></i> Evolución de los Sistemas de I/O
+                      </h3>
+                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-slate-900/60 p-4 rounded-lg border border-slate-700">
+                          <div class="text-sm font-semibold text-cyan-400 mb-2">Década 1970-1980</div>
+                          <p class="text-xs text-slate-400">Primeros microprocesadores. I/O básico mediante puertos serie y paralelo. Sin interrupciones sofisticadas.</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 rounded-lg border border-slate-700">
+                          <div class="text-sm font-semibold text-cyan-400 mb-2">Década 1990-2000</div>
+                          <p class="text-xs text-slate-400">Introducción de USB, FireWire. DMA más común. Controladores integrados en chipset.</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 rounded-lg border border-slate-700">
+                          <div class="text-sm font-semibold text-cyan-400 mb-2">Década 2010-2026</div>
+                          <p class="text-xs text-slate-400">PCIe 7.0, USB4, Thunderbolt, CXL. I/O de alta velocidad integrados directamente en la CPU.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 4. Tecnologías 2026 -->
+                    <div class="bg-gradient-to-r from-purple-900/40 via-indigo-900/40 to-purple-900/40 p-6 rounded-xl border border-purple-500/30 mb-8">
+                      <h3 class="text-xl font-semibold text-purple-400 mb-3 flex items-center gap-2">
+                        <i class="fas fa-rocket"></i> Tecnologías 2026
+                      </h3>
+                      <p class="text-slate-300 leading-relaxed mb-4">
+                        En 2026, los sistemas de I/O se han optimizado mediante tecnologías de alta velocidad que permiten mayores tasas de transferencia, mejor eficiencia energética y un mejor soporte para aplicaciones exigentes como la IA y el cómputo de alto rendimiento.
+                      </p>
+                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-slate-900/60 p-4 rounded-lg border border-slate-700 text-center">
+                          <div class="text-lg font-bold text-brand-400 mb-1">PCIe 7.0</div>
+                          <p class="text-xs text-slate-400">Bus de alta velocidad para GPUs, SSDs y dispositivos de expansión</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 rounded-lg border border-slate-700 text-center">
+                          <div class="text-lg font-bold text-brand-400 mb-1">USB4 v2</div>
+                          <p class="text-xs text-slate-400">Conectividad universal de hasta 80 Gbps</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 rounded-lg border border-slate-700 text-center">
+                          <div class="text-lg font-bold text-brand-400 mb-1">CXL</div>
+                          <p class="text-xs text-slate-400">Memoria expandible y comunicación coherente CPU-GPU</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 5. Dispositivos comunes -->
+                    <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-600 mb-8">
+                      <h3 class="text-lg font-semibold text-green-400 mb-4 flex items-center gap-2">
+                        <i class="fas fa-laptop"></i> Dispositivos de Entrada/Salida
+                      </h3>
+                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <h4 class="text-sm font-semibold text-blue-400 mb-2">Dispositivos de Entrada</h4>
+                          <ul class="text-xs text-slate-400 space-y-1">
+                            <li><i class="fas fa-keyboard text-slate-500 mr-2"></i>Teclado</li>
+                            <li><i class="fas fa-mouse text-slate-500 mr-2"></i>Mouse / Ratón</li>
+                            <li><i class="fas fa-gamepad text-slate-500 mr-2"></i>Joystick</li>
+                            <li><i class="fas fa-camera text-slate-500 mr-2"></i>Cámara web</li>
+                            <li><i class="fas fa-microphone text-slate-500 mr-2"></i>Micrófono</li>
+                            <li><i class="fas fa-barcode text-slate-500 mr-2"></i>Escáner</li>
+                          </ul>
+                        </div>
+                        <div>
+                          <h4 class="text-sm font-semibold text-blue-400 mb-2">Dispositivos de Salida</h4>
+                          <ul class="text-xs text-slate-400 space-y-1">
+                            <li><i class="fas fa-desktop text-slate-500 mr-2"></i>Monitor</li>
+                            <li><i class="fas fa-volume-up text-slate-500 mr-2"></i>Altavoz</li>
+                            <li><i class="fas fa-print text-slate-500 mr-2"></i>Impresora</li>
+                            <li><i class="fas fa-projector text-slate-500 mr-2"></i>Proyector</li>
+                            <li><i class="fas fa-headphones text-slate-500 mr-2"></i>Auriculares</li>
+                          </ul>
+                        </div>
+                        <div>
+                          <h4 class="text-sm font-semibold text-purple-400 mb-2">Dispositivos Mixtos</h4>
+                          <ul class="text-xs text-slate-400 space-y-1">
+                            <li><i class="fas fa-hdd text-slate-500 mr-2"></i>Disco duro (HDD/SSD)</li>
+                            <li><i class="fas fa-wifi text-slate-500 mr-2"></i>Tarjeta de red</li>
+                            <li><i class="fas fa-bluetooth text-slate-500 mr-2"></i>Bluetooth</li>
+                            <li><i class="fas fa-usb text-slate-500 mr-2"></i>USB / Thunderbolt</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 6. Temas del curso -->
+                    <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-600 mb-8">
+                      <h3 class="text-lg font-semibold text-brand-400 mb-4 flex items-center gap-2">
+                        <i class="fas fa-list-ul"></i> Temas que exploraremos
+                      </h3>
+                      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="flex items-center gap-3 p-3 bg-slate-900/50 rounded-lg">
+                          <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-bolt text-blue-400"></i>
+                          </div>
+                          <div>
+                            <span class="text-sm font-semibold text-slate-300">Interrupciones</span>
+                            <p class="text-xs text-slate-500">Mecanismo IRQ</p>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-slate-900/50 rounded-lg">
+                          <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-microchip text-green-400"></i>
+                          </div>
+                          <div>
+                            <span class="text-sm font-semibold text-slate-300">DMA</span>
+                            <p class="text-xs text-slate-500">Acceso directo a memoria</p>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-slate-900/50 rounded-lg">
+                          <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-network-wired text-purple-400"></i>
+                          </div>
+                          <div>
+                            <span class="text-sm font-semibold text-slate-300">Buses</span>
+                            <p class="text-xs text-slate-500">Jerarquía de comunicación</p>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-slate-900/50 rounded-lg">
+                          <div class="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-rocket text-yellow-400"></i>
+                          </div>
+                          <div>
+                            <span class="text-sm font-semibold text-slate-300">Avances 2026</span>
+                            <p class="text-xs text-slate-500">PCIe 7.0, USB4, CXL</p>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-slate-900/50 rounded-lg">
+                          <div class="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-gamepad text-red-400"></i>
+                          </div>
+                          <div>
+                            <span class="text-sm font-semibold text-slate-300">Quiz</span>
+                            <p class="text-xs text-slate-500">Evaluación final</p>
+                        </div>
+                        </div>
+                        </div>
+                      </div>
+            <div class="mt-6 flex justify-between">
+              <button class="text-slate-400 hover:text-white transition" onclick="navegarA('intro')"><i class="fas fa-arrow-left mr-2"></i> Anterior</button>
+              <button class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded font-semibold transition" onclick="navegarA('interrupciones')">Siguiente: interrupciones <i class="fas fa-arrow-right ml-2"></i></button>
+            </div>
+      </div>
+
+    <!-- ================= SECCIÓN: INTERRUPCIONES ================= -->
+      <div id="interrupciones" class="level-content" role="tabpanel" aria-labelledby="tab-interrupciones">
+            <h2 class="text-3xl font-bold mb-4 flex items-center gap-3"><i class="fas fa-bolt text-brand-400"></i> Interrupciones (IRQ – Interrupt Request / Solicitud De Interrupción)</h2>
+            <p class="text-lg text-slate-300 mb-4 leading-relaxed">
+              <strong>Las interrupciones (IRQ, Interrupt Request)</strong> son un mecanismo fundamental en los sistemas de entrada/salida que permite a los dispositivos periféricos notificar a la CPU, de forma asíncrona, cuando requieren atención. De esta manera, se evita que el procesador tenga que consultar constantemente el estado de los dispositivos como ocurre en técnicas como polling o busy-waiting, optimizando el uso de los recursos y mejorando la eficiencia del sistema.
+            </p>
+
+            <!-- Tipos de Interrupciones -->
+            <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 mb-4">
+              <h3 class="text-base font-semibold text-pink-400 mb-3"><i class="fas fa-tags mr-2"></i>Tipos de Interrupciones</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="bg-red-900/30 border border-red-600/50 rounded-lg p-3">
+                  <h4 class="text-sm font-semibold text-red-400 mb-2">Por Origen</h4>
+                  <ul class="text-xs text-slate-400 space-y-2">
+                    <li><span class="text-white">Hardware:</span> Dispositivos físicos (teclado, disco, red)</li>
+                    <li><span class="text-white">Software:</span> Instrucciones INT n (syscalls)</li>
+                    <li><span class="text-white">Excepciones:</span> Errores CPU (división por cero, page fault)</li>
+                  </ul>
+                </div>
+                <div class="bg-yellow-900/30 border border-yellow-600/50 rounded-lg p-3">
+                  <h4 class="text-sm font-semibold text-yellow-400 mb-2">Por Activación</h4>
+                  <ul class="text-xs text-slate-400 space-y-2">
+                    <li><span class="text-white">Edge-triggered:</span> Flanco (0→1 o 1→0)</li>
+                    <li><span class="text-white">Level-triggered:</span> Nivel (HIGH mientras dura)</li>
+                    <li><span class="text-white text-xs">* Legacy típicamente level</span></li>
+                    <li><span class="text-white text-xs">* PCIe moderno edge</span></li>
+                  </ul>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                <div class="bg-blue-900/30 border border-blue-600/50 rounded-lg p-3">
+                  <h4 class="text-sm font-semibold text-blue-400 mb-2">Enmascarables</h4>
+                  <ul class="text-xs text-slate-400 space-y-1">
+                    <li>• IRQ estándar (0-15)</li>
+                    <li>• Se pueden habilitar/deshabilitar</li>
+                    <li>• Con flag IF en CPU</li>
+                    <li>• CLI/STI en x86</li>
+                  </ul>
+                </div>
+                <div class="bg-purple-900/30 border border-purple-600/50 rounded-lg p-3">
+                  <h4 class="text-sm font-semibold text-purple-400 mb-2">No Enmascarables (NMI)</h4>
+                  <ul class="text-xs text-slate-400 space-y-1">
+                    <li>• Siempre atendidas</li>
+                    <li>• Paridad de memoria</li>
+                    <li>• Fallo de Hardware</li>
+                    <li>• No se puede ignorar</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- INTERRUPCIONES: 2 columnas -->
+            <div class="grid md:grid-cols-2 gap-4 mb-6">
+              <!-- LADO IZQUIERDO -->
+              <div class="space-y-4 overflow-hidden">
+                <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                  <h3 class="text-base font-semibold text-blue-400 mb-2">¿Cómo funciona?</h3>
+                  <ul class="space-y-1 text-slate-300 text-xs">
+                    <li><strong>1.</strong> El dispositivo periférico (teclado, mouse, disco duro, tarjeta de red, GPU, etc.) genera una señal eléctrica llamada IRQ cuando necesita atención.</li>
+                    <li><strong>2.</strong> El controlador de interrupciones (APIC) recibe la señal, la prioriza y la envía a la CPU correspondiente.</li>
+                    <li><strong>3.</strong> La CPU suspende la ejecución del programa actual, guarda el contexto (registros y contador de programa) en la pila.</li>
+                    <li><strong>4.</strong> Ejecuta la <strong>ISR</strong> (Rutina de Servicio de Interrupción) correspondiente al dispositivo.</li>
+                    <li><strong>5.</strong> Al terminar la ISR, restaura el contexto y continúa exactamente donde se había interrumpido.</li>
+                  </ul>
+                  <p class="text-slate-400 text-xs mt-2">
+                    Todo este proceso ocurre en cuestión de microsegundos, siendo prácticamente imperceptible para el usuario.
+                  </p>
+                </div>
+
+                <div class="bg-gradient-to-r from-slate-900/60 via-slate-800/80 to-slate-900/60 p-4 rounded-2xl border border-cyan-500/20">
+                  <h3 class="text-base font-semibold text-yellow-400 mb-2 inline-block">¿Qué es Polling?
+                  </h3>
+                  <p class="text-slate-300 text-xs mb-4">
+                    El polling es un método de espera activa en el que la CPU consulta repetidamente el estado de un dispositivo para determinar si requiere atención.
+                  </p>
+                  <div class="grid gap-3 md:grid-cols-2">
+                    <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700 shadow-[0_0_15px_rgba(56,189,248,0.15)]">
+                      <div class="mb-3">
+                        <h4 class="text-sm font-semibold text-cyan-300">Ejemplo</h4>
+                      </div>
+                      <p class="text-slate-300 text-xs mb-2">Imagina que estás esperando un mensaje:</p>
+                      <ul class="space-y-2 text-slate-300 text-xs">
+                        <li><span class="font-semibold text-white">Polling:</span> Tú miras el celular cada 2 segundos, aunque no haya nada.</li>
+                        <li><span class="font-semibold text-white">Interrupción:</span> El celular te notifica solo cuando llega algo.</li>
+                      </ul>
+                    </div>
+                    <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700 shadow-[0_0_15px_rgba(248,113,113,0.15)]">
+                      <div class="mb-3">
+                        <h4 class="text-sm font-semibold text-rose-300">Problema</h4>
+                      </div>
+                      <ul class="space-y-2 text-slate-300 text-xs">
+                        <li><span class="font-semibold text-red-300">Gasta tiempo de la CPU.</span></li>
+                        <li><span class="font-semibold text-red-300">Es ineficiente.</span></li>
+                        <li><span class="font-semibold text-red-300">Consume más energía.</span></li>
+                      </ul>
+                    </div>
+                  </div>
+                  <p class="text-slate-300 text-xs mt-4 border-t border-slate-700 pt-3">
+                    <strong class="text-cyan-200">Por eso existen las interrupciones:</strong> el dispositivo avisa cuando pasa algo y la CPU no pierde tiempo.
+                  </p>
+                </div>
+
+                <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                  <h3 class="text-base font-semibold text-blue-400 mb-2">Tarjetas de Red (NIC)</h3>
+                  <p class="text-slate-300 text-xs mb-3">
+                    La <strong>NIC</strong> (Network Interface Card) es el componente que permite la comunicación con una red, ya sea por cable (Ethernet) o inalámbrica (WiFi).
+                  </p>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="bg-green-900/30 border border-green-600/50 rounded-lg p-3">
+                      <h4 class="text-sm font-semibold text-green-400 mb-2"><i class="fas fa-ethernet mr-1"></i> Ethernet (Cableada)</h4>
+                      <ul class="text-xs text-slate-400 space-y-1">
+                        <li>• Datos via señales eléctricas por cable</li>
+                        <li>• Más estable y menor latencia</li>
+                        <li>• Menos interferencias</li>
+                      </ul>
+                    </div>
+                    <div class="bg-blue-900/30 border border-blue-600/50 rounded-lg p-3">
+                      <h4 class="text-sm font-semibold text-blue-400 mb-2"><i class="fas fa-wifi mr-1"></i> WiFi (Inalámbrica)</h4>
+                      <ul class="text-xs text-slate-400 space-y-1">
+                        <li>• Datos via ondas de radio</li>
+                        <li>• Más flexible (sin cables)</li>
+                        <li>• Mayor latencia, posibles interferencias</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <p class="text-slate-400 text-xs mt-3">
+                    Cuando llegan paquetes, la NIC genera una IRQ para notificar a la CPU. Ethernet genera <span class="text-green-400">menos</span> interrupciones (mejor coalescing), mientras WiFi genera <span class="text-red-400">más</span> por el medio inalámbrico ruidoso.
+                  </p>
+                </div>
+
+                <!-- Tabla comparativa: Polling vs Interrupciones vs DMA -->
+                <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 mt-4">
+                  <h3 class="text-base font-semibold text-purple-400 mb-3">Polling vs Interrupciones vs DMA</h3>
+                  <p class="text-slate-300 text-xs mb-3">
+                    Los 3 métodos para manejar I/O. Cada uno tiene un costo diferente en términos de overhead de CPU:
+                  </p>
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-xs">
+                      <thead>
+                        <tr class="border-b border-slate-600">
+                          <th class="text-left py-2 px-2 text-slate-400">Método</th>
+                          <th class="text-center py-2 px-2 text-slate-400">Overhead CPU</th>
+                          <th class="text-center py-2 px-2 text-slate-400">Latencia</th>
+                          <th class="text-left py-2 px-2 text-slate-400">Uso típico</th>
+                        </tr>
+                      </thead>
+                      <tbody class="text-slate-300">
+                        <tr class="border-b border-slate-700">
+                          <td class="py-2 px-2 font-semibold text-red-400">Polling</td>
+                          <td class="text-center py-2 px-2"><span class="bg-red-500/20 text-red-300 px-2 py-0.5 rounded">Muy Alto</span></td>
+                          <td class="text-center py-2 px-2">Alta (consulta continua)</td>
+                          <td class="py-2 px-2">Dispositivos simples, embedded</td>
+                        </tr>
+                        <tr class="border-b border-slate-700">
+                          <td class="py-2 px-2 font-semibold text-yellow-400">Interrupciones</td>
+                          <td class="text-center py-2 px-2"><span class="bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded">Bajo</span></td>
+                          <td class="text-center py-2 px-2">Baja (evento inmediato)</td>
+                          <td class="py-2 px-2">Teclado, mouse, red</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 px-2 font-semibold text-green-400">DMA</td>
+                          <td class="text-center py-2 px-2"><span class="bg-green-500/20 text-green-300 px-2 py-0.5 rounded">Mínimo</span></td>
+                          <td class="text-center py-2 px-2">Muy baja (hardware)</td>
+                          <td class="py-2 px-2">SSD, GPU, audio, red masiva</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <p class="text-slate-400 text-[10px] mt-3">
+                    <strong>Nota:</strong> Polling consume CPU continuamente. Interrupciones solo cuando hay evento. DMA transfiere sin CPU (solo setup inicial).
+                  </p>
+                </div>
+
+                <!-- Controladores de Interrupción -->
+                <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 mt-4">
+                  <h3 class="text-base font-semibold text-cyan-400 mb-3"><i class="fas fa-microchip mr-2"></i>Controladores de Interrupción</h3>
+                  <p class="text-slate-300 text-xs mb-3">
+                    Los controladores de interrupción gestionan las solicitudes de IRQ de los dispositivos y las enrutan a la CPU.
+                  </p>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-600">
+                      <h4 class="text-sm font-semibold text-yellow-400 mb-2">PIC (8259A) - Legacy</h4>
+                      <ul class="text-xs text-slate-400 space-y-1">
+                        <li>• 8 líneas de IRQ (IRQ 0-7)</li>
+                        <li>• 2 PICs en cascada (maestro/esclavo)</li>
+                        <li>• Usado hasta Pentium</li>
+                        <li>• Programable (ICW1-4)</li>
+                      </ul>
+                    </div>
+                    <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-600">
+                      <h4 class="text-sm font-semibold text-green-400 mb-2">APIC (Advanced PIC) - Moderno</h4>
+                      <ul class="text-xs text-slate-400 space-y-1">
+                        <li>• Hasta 24 líneas IRQ</li>
+                        <li>• Local APIC en CPU</li>
+                        <li>• IOAPIC para periféricos</li>
+                        <li>• Soporte multi-núcleo</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="bg-cyan-900/30 border border-cyan-600/50 rounded-lg p-3 mt-3">
+                    <h4 class="text-sm font-semibold text-cyan-400 mb-2">Funcionamiento del APIC</h4>
+                    <ol class="text-xs text-slate-400 space-y-1 list-decimal list-inside">
+                      <li>Dispositivo genera IRQ → controlador IOAPIC</li>
+                      <li>IOAPIC crea mensaje APIC (vector 0-255)</li>
+                      <li>Se envía por APIC bus al Local APIC</li>
+                      <li>Local APIC interrumpe a la CPU</li>
+                      <li>CPU ejecuta ISR usando el vector</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+
+              <!-- LADO DERECHO - Simulador Teclado + WiFi vs Ethernet -->
+              <div class="overflow-hidden space-y-4">
+                <!-- Simulador de Teclado (Timeline Interactivo) -->
+                <div class="bg-slate-800/50 p-3 sm:p-4 rounded-xl border border-slate-700">
+                  <h3 class="font-semibold text-center mb-2 sm:mb-3 text-slate-300 text-sm sm:text-base">Simulador: Presionar una tecla</h3>
+                  
+                  <div class="flex justify-center items-center gap-2 sm:gap-3 mb-3 p-2 bg-slate-700/30 rounded-lg border border-slate-600">
+                    <span class="text-xs text-slate-400">Presiona:</span>
+                    <input type="text" id="input-simulador" disabled class="px-2 py-1 bg-slate-800 border border-slate-600 rounded text-slate-200 text-sm focus:outline-none focus:border-red-500 w-12 sm:w-16 disabled:opacity-50 disabled:cursor-not-allowed" placeholder="..." maxlength="1" oninput="animarFlujoIRQ()">
+                  </div>
+                        
+                  <div class="bg-slate-900 rounded-lg border border-slate-700 p-2 mb-3">
+                    <h4 class="text-xs font-bold text-slate-400 mb-1 uppercase">Estado del CPU</h4>
+                    <div class="relative">
+                      <canvas id="timeline-canvas" class="w-full bg-slate-800 rounded border border-slate-700" height="80"></canvas>
+                      <span class="absolute -top-2 right-0 text-xs text-slate-400">100%</span>
+                      <span class="absolute -bottom-2 right-0 text-xs text-slate-400">0%</span>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-2 mb-2">
+                    <div class="bg-blue-900/40 border border-blue-600 rounded-lg p-2">
+                      <div class="text-xs text-blue-400 font-semibold">Estado CPU</div>
+                      <div id="cpu-state-indicator" class="text-xs text-blue-300 mt-1"><i class="fas fa-circle-notch fa-spin"></i> Esperando</div>
+                    </div>
+                    <div class="bg-red-900/40 border border-red-600 rounded-lg p-2">
+                      <div class="text-xs text-red-400 font-semibold">Evento</div>
+                      <div id="event-indicator" class="text-xs text-red-300 mt-1"><i class="fas fa-clock"></i> Ninguno</div>
+                    </div>
+                  </div>
+
+                  <div class="flex justify-center gap-2 mb-2">
+                    <button id="btn-iniciar-cpu" class="bg-blue-600 hover:bg-blue-500 px-2 sm:px-3 py-1 rounded font-semibold transition-all flex items-center gap-1 text-xs" onclick="iniciarSimuladorCPU()"><i class="fas fa-play"></i> Iniciar</button>
+                    <button id="btn-detener-cpu" class="bg-gray-600 hover:bg-gray-500 px-2 sm:px-3 py-1 rounded font-semibold transition-all flex items-center gap-1 text-xs opacity-50 cursor-not-allowed" onclick="detenerSimuladorCPU()" disabled><i class="fas fa-stop"></i> Detener</button>
+                    <button id="btn-simular-tecla" class="bg-red-600 hover:bg-red-500 px-2 sm:px-3 py-1 rounded font-semibold transition-all flex items-center gap-1 text-xs opacity-50 cursor-not-allowed" onclick="simularPresionTecla()" disabled><i class="fas fa-keyboard"></i> Simular</button>
+                  </div>
+
+                  <p id="cpu-status-text" class="text-center text-xs text-slate-300 mb-2 font-medium">Sistema listo. Haz clic en "Iniciar".</p>
+                  
+                  <!-- Flujo de Interrupción (IRQ) -->
+                  <div class="mt-3 p-3 bg-slate-900/60 rounded-lg border border-slate-700">
+                    <h4 class="text-sm font-semibold text-cyan-400 mb-2 flex items-center gap-2"><i class="fas fa-project-diagram"></i> Flujo de Interrupción (IRQ)</h4>
+                    <div class="flex items-center justify-between gap-1 text-xs">
+                      <div class="flex flex-col items-center">
+                        <div id="irq-circle-1" class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 rounded-full flex items-center justify-center mb-1 transition-transform duration-200"><i class="fas fa-microchip text-white text-xs"></i></div>
+                        <span class="text-slate-400 text-[10px]">1. Dispositivo</span>
+                      </div>
+                      <div class="text-yellow-400 text-xs"><i class="fas fa-arrow-right"></i></div>
+                      <div class="flex flex-col items-center">
+                        <div id="irq-circle-2" class="w-8 h-8 sm:w-10 sm:h-10 bg-purple-600 rounded-full flex items-center justify-center mb-1 transition-transform duration-200"><i class="fas fa-brain text-white text-xs"></i></div>
+                        <span class="text-slate-400 text-[10px]">2. Controlador</span>
+                      </div>
+                      <div class="text-yellow-400 text-xs"><i class="fas fa-arrow-right"></i></div>
+                      <div class="flex flex-col items-center">
+                        <div id="irq-circle-3" class="w-8 h-8 sm:w-10 sm:h-10 bg-red-600 rounded-full flex items-center justify-center mb-1 transition-transform duration-200"><i class="fas fa-exclamation text-white text-xs"></i></div>
+                        <span class="text-slate-400 text-[10px]">3. IRQ</span>
+                      </div>
+                      <div class="text-yellow-400 text-xs"><i class="fas fa-arrow-right"></i></div>
+                      <div class="flex flex-col items-center">
+                        <div id="irq-circle-4" class="w-8 h-8 sm:w-10 sm:h-10 bg-green-600 rounded-full flex items-center justify-center mb-1 transition-transform duration-200"><i class="fas fa-save text-white text-xs"></i></div>
+                        <span class="text-slate-400 text-[10px]">4. Guardar</span>
+                      </div>
+                      <div class="text-yellow-400 text-xs"><i class="fas fa-arrow-right"></i></div>
+                      <div class="flex flex-col items-center">
+                        <div id="irq-circle-5" class="w-8 h-8 sm:w-10 sm:h-10 bg-cyan-600 rounded-full flex items-center justify-center mb-1 transition-transform duration-200"><i class="fas fa-code text-white text-xs"></i></div>
+                        <span class="text-slate-400 text-[10px]">5. ISR</span>
+                      </div>
+                      <div class="text-yellow-400 text-xs"><i class="fas fa-arrow-right"></i></div>
+                      <div class="flex flex-col items-center">
+                        <div id="irq-circle-6" class="w-8 h-8 sm:w-10 sm:h-10 bg-orange-600 rounded-full flex items-center justify-center mb-1 transition-transform duration-200"><i class="fas fa-undo text-white text-xs"></i></div>
+                        <span class="text-slate-400 text-[10px]">6. Restaurar</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Simulador WiFi vs Ethernet -->
+                <div class="p-3 sm:p-4 rounded-xl border border-slate-700">
+                  <h3 class="font-semibold text-center mb-2 sm:mb-3 text-slate-300 text-sm sm:text-base">Simulador WiFi vs Ethernet: IRQ/s</h3>
+                  
+                  <div class="flex flex-wrap justify-center gap-2 mb-3">
+                    <button id="startBtn2" class="bg-green-600 hover:bg-green-500 px-3 py-1 rounded text-xs font-semibold" onclick="iniciarSimuladorWifi()"><i class="fas fa-play mr-1"></i>Iniciar</button>
+                    <button id="stopBtn2" class="bg-red-600 hover:bg-red-500 px-3 py-1 rounded text-xs font-semibold opacity-50" disabled onclick="detenerSimuladorWifi()"><i class="fas fa-stop mr-1"></i>Detener</button>
+                    <span class="text-slate-500 mx-1">|</span>
+                    <div>
+                      <label class="text-xs text-slate-400">Carga: </label>
+                      <input type="range" id="loadSlider2" min="0" max="100" value="60" class="w-16 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                      <span id="loadValue2" class="text-xs text-cyan-400 ml-1">60%</span>
+                    </div>
+                    <button id="napiBtn2" class="bg-cyan-600 hover:bg-cyan-500 px-2 py-1 rounded text-xs font-semibold">NAPI</button>
+                    <button id="stressBtn2" class="bg-red-900/50 hover:bg-red-800 border border-red-500 text-red-300 px-2 py-1 rounded text-xs font-semibold">Estrés</button>
+                  </div>
+                  
+                  <canvas id="simCanvas2" width="700" height="500" class="w-full max-w-full rounded-lg border border-cyan-500/30"></canvas>
+                  
+                  <!-- Coalescing bars only -->
+                  <div class="flex flex-wrap justify-center items-start gap-6 md:gap-12 mt-4">
+                    <div class="text-center min-w-[140px]">
+                      <div class="text-cyan-400 text-sm" style="text-shadow: 0 0 10px #00ccff;">CPU Ethernet</div>
+                      <div class="mt-2">
+                        <div class="text-xs text-slate-400">Coalescing</div>
+                        <div class="w-24 h-2 bg-slate-700 rounded-full mx-auto mt-1 overflow-hidden">
+                          <div id="ethCoalescingBar" class="h-full bg-green-500 transition-all duration-300" style="width: 80%"></div>
+                        </div>
+                        <div id="ethCoalescingText" class="text-xs text-green-400 mt-1">80%</div>
+                      </div>
+                    </div>
+                    <div class="text-center min-w-[140px]">
+                      <div class="text-pink-400 text-sm" style="text-shadow: 0 0 10px #ff44aa;">CPU WiFi</div>
+                      <div class="mt-2">
+                        <div class="text-xs text-slate-400">Coalescing</div>
+                        <div class="w-24 h-2 bg-slate-700 rounded-full mx-auto mt-1 overflow-hidden">
+                          <div id="wifiCoalescingBar" class="h-full bg-yellow-500 transition-all duration-300" style="width: 35%"></div>
+                        </div>
+                        <div id="wifiCoalescingText" class="text-xs text-yellow-400 mt-1">35%</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="mt-2 p-2 bg-slate-900/60 rounded-lg border border-slate-700">
+                    <h4 class="text-sm font-semibold text-cyan-400 mb-2 text-center">IRQ/s por Tipo de Conexión</h4>
+                    <p class="text-xs text-slate-400 text-center">
+                      <strong class="text-yellow-400">Explicación:</strong><br>
+                      Cada ⚡ amarillo = una IRQ. El flujo completo es:
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2 text-xs">
+                      <div class="bg-green-900/30 border border-green-600/50 rounded-lg p-2">
+                        <h4 class="text-green-400 font-semibold mb-1">Ethernet</h4>
+                        <ol class="text-slate-400 space-y-1 list-decimal list-inside">
+                          <li>Paquete llega → <strong class="text-cyan-400">DMA</strong> lo copia a RAM (sin CPU)</li>
+                          <li>Coalescing: espera 8 paquetes <span class="text-slate-500">o</span> 50µs</li>
+                          <li>Dispara IRQ → <strong class="text-cyan-400">NAPI</strong>:</li>
+                          <li class="list-none pl-3">• Desactiva IRQ</li>
+                          <li class="list-none pl-3">• Polling en bucle</li>
+                          <li class="list-none pl-3">• Reactiva IRQ</li>
+                          <li>Muy eficiente para 1-10+ Gbps</li>
+                        </ol>
+                      </div>
+                      <div class="bg-red-900/30 border border-red-600/50 rounded-lg p-2">
+                        <h4 class="text-red-400 font-semibold mb-1">WiFi</h4>
+                        <ol class="text-slate-400 space-y-1 list-decimal list-inside">
+                          <li>Medio compartido: <strong class="text-yellow-400">CSMA/CA</strong></li>
+                          <li>Beacons, probes, control de potencia</li>
+                          <li>Más "ruido" → más IRQ</li>
+                          <li>Tráfico <strong class="text-yellow-400">bursty</strong> (ráfagas)</li>
+                          <li>Más <strong class="text-cyan-400">softirqs</strong> (software)</li>
+                          <li>WPA cifrado: overhead extra</li>
+                          <li>Peor coalescing que Ethernet</li>
+                        </ol>
+                      </div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-2 text-center">
+                      <strong class="text-cyan-400">NAPI</strong> = New API: desactiva IRQ → polling → reactiva. Reduce drásticamente interrupciones.<br>
+                      <strong class="text-green-400">Ethernet</strong>: menor uso de CPU.<br>
+                      <strong class="text-red-400">WiFi</strong>: mayor overhead por protocolo 802.11 y medio compartido.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-6 flex justify-between">
+              <button class="text-slate-400 hover:text-white transition" onclick="navegarA('intro')"><i class="fas fa-arrow-left mr-2"></i> Anterior</button>
+              <button class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded font-semibold transition" onclick="navegarA('dma')">Siguiente: DMA <i class="fas fa-arrow-right ml-2"></i></button>
+            </div>
+      </div>
+
+          <!-- ================= SECCIÓN 2: DMA ================= -->
+      <div id="dma" class="level-content" role="tabpanel" aria-labelledby="tab-dma">
+            <div class="p-4 rounded-xl">
+              <h2 class="text-3xl font-bold mb-4 flex items-center gap-3">
+                <i class="fas fa-microchip text-brand-400"></i> Acceso Directo a Memoria (DMA)
+              </h2>
+              <div class="flex gap-4 items-start mb-8">
+                <p class="text-lg leading-relaxed text-slate-300 flex-1">
+                  El <strong>DMA</strong> es una técnica que permite transferir datos entre un dispositivo y la memoria RAM sin que la <strong>CPU</strong> tenga que intervenir en cada operación.
+                </p>
+                <div class="relative inline-block group cursor-pointer flex-shrink-0" title="Ver diagrama DMA" onclick="abrirImagen('img/DMA.jpg')">
+                  <i class="fas fa-eye text-slate-400 text-xl hover:text-cyan-400 transition"></i>
+                  <div class="absolute z-[999] hidden group-hover:block right-0 mt-2 w-[500px] p-2 bg-slate-900 rounded-lg border border-cyan-500 shadow-lg shadow-cyan-500/30 pointer-events-none">
+                    <img src="img/DMA.jpg" alt="DMA" class="w-full max-h-64 object-contain rounded">
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-slate-900 p-6 rounded-xl mb-8">
+                <h3 class="text-xl font-semibold text-orange-400 mb-4">¿Por qué es necesario?</h3>
+                
+                <div class="mb-6">
+                  <h4 class="text-base font-semibold text-slate-300 mb-3">Programmed I/O (Entrada/Salida Programada)</h4>
+                  <p class="text-slate-400 text-sm mb-4">Método donde la CPU controla directamente la transferencia de datos.</p>
+                  
+                  <!-- Ejemplo -->
+                  <div class="bg-slate-800/60 border border-slate-600 rounded-lg p-4 mb-4">
+                    <h5 class="font-semibold text-slate-300 mb-2 flex items-center gap-2">
+                      <i class="fas fa-cube"></i>Ejemplo
+                    </h5>
+                    <div class="bg-slate-900 p-3 rounded border border-slate-700 text-sm">
+                      <span class="text-slate-400">Transferir 1 MB:</span>
+                      <div class="font-mono text-yellow-400 font-semibold">≈ 15 millones de ciclos CPU</div>
+                    </div>
+                  </div>
+                  
+                  <!-- Problema y Solución en columnas -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-red-900/30 border border-red-600 rounded-lg p-4">
+                      <h5 class="font-semibold text-red-400 mb-3 flex items-center gap-2">
+                        <i class="fas fa-times-circle"></i>Problema
+                      </h5>
+                      <ul class="text-slate-300 text-sm space-y-1 mb-3">
+                        <li>• La CPU ejecuta una instrucción por cada dato</li>
+                        <li>• Se vuelve lenta e ineficiente</li>
+                      </ul>
+                      <div class="bg-red-900/50 p-2 rounded border border-red-700">
+                        <span class="text-red-400 font-semibold">Resultado:</span>
+                        <div class="text-red-300 font-semibold">CPU prácticamente bloqueada</div>
+                      </div>
+                    </div>
+                    
+                    <div class="bg-green-900/30 border border-green-600 rounded-lg p-4">
+                      <h5 class="font-semibold text-green-400 mb-2 flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i>Solución con DMA
+                      </h5>
+                      <p class="text-slate-300 text-sm">Con DMA, la CPU solo interviene en la configuración inicial y recibe una IRQ al final. Esto libera la CPU para otras tareas mientras ocurre la transferencia.</p>
+                    </div>
+                  </div>
+                </div>
+                
+              </div>
+
+              <div class="bg-slate-800/60 border border-slate-600 rounded-xl p-4 mb-8">
+                <h3 class="text-base font-semibold text-blue-300 mb-3 flex items-center gap-2">
+                  <i class="fas fa-lightbulb"></i>¿Cómo funciona DMA?
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div class="bg-slate-900/50 p-3 rounded border border-slate-700">
+                    <p class="text-slate-300 mb-2"><strong class="text-cyan-300">Solicitud DRQ:</strong> El dispositivo I/O solicita transferencia al controlador DMA, no a la CPU.</p>
+                  </div>
+                  <div class="bg-slate-900/50 p-3 rounded border border-slate-700">
+                    <p class="text-slate-300 mb-2"><strong class="text-cyan-300">Controlador DMA:</strong> Un chip especializado que actúa como intermediario entre el dispositivo I/O y la memoria.</p>
+                  </div>
+                  <div class="bg-slate-900/50 p-3 rounded border border-slate-700">
+                    <p class="text-slate-300 mb-2"><strong class="text-cyan-300">Transferencia Directa:</strong> Los datos van directamente de dispositivo a RAM sin pasar por la CPU.</p>
+                  </div>
+                  <div class="bg-slate-900/50 p-3 rounded border border-slate-700">
+                    <p class="text-slate-300 mb-2"><strong class="text-cyan-300">Interrupción Final:</strong> Al terminar, el DMA envía una IRQ para notificar a la CPU.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-10 bg-emerald-900/30 border border-emerald-700 p-6 rounded-xl mb-8">
+                <h3 class="text-emerald-400 font-semibold mb-3">Beneficios cuantitativos</h3>
+                <p class="text-slate-300 mb-4">
+                  • CPU involucrada solo en la configuración inicial y la IRQ final (aprox. 200 ciclos).<br>
+                  • En una transferencia de 1 MB, la CPU queda libre más del <strong>99.9%</strong> del tiempo.<br>
+                  • Ideal para SSD NVMe, tarjetas de red, audio y GPUs.
+                </p>
+              </div>
+
+              <div class="bg-slate-800/60 border border-slate-600 rounded-xl p-4 mb-8">
+                <h3 class="text-base font-semibold text-yellow-300 mb-3 flex items-center gap-2">
+                  <i class="fas fa-cog"></i>Componentes clave del DMA
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                  <div class="bg-slate-900/50 p-3 rounded border border-slate-700">
+                    <p><strong class="text-yellow-300">Controlador DMA:</strong> Gestiona direcciones de memoria, contadores y control de transferencia.</p>
+                  </div>
+                  <div class="bg-slate-900/50 p-3 rounded border border-slate-700">
+                    <p><strong class="text-yellow-300">Ciclos de Bus:</strong> DMA roba ciclos del bus de sistema para transferir bloques de datos.</p>
+                  </div>
+                  <div class="bg-slate-900/50 p-3 rounded border border-slate-700">
+                    <p><strong class="text-yellow-300">Demultiplexor de Señales:</strong> Coordina entre CPU, memoria y periféricos sin conflictos.</p>
+                  </div>
+                  <div class="bg-slate-900/50 p-3 rounded border border-slate-700">
+                    <p><strong class="text-yellow-300">Modos de Transferencia:</strong> Burst (rápido), Cycle Stealing (intercalado) o Transparent (sin interferencia).</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Modos de Transferencia DMA -->
+              <div class="bg-slate-800/60 border border-slate-600 rounded-xl p-4 mb-8">
+                <h3 class="text-base font-semibold text-cyan-300 mb-3 flex items-center gap-2">
+                  <i class="fas fa-tasks mr-2"></i>Modos de Transferencia DMA
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                  <div class="bg-green-900/30 border border-green-600/50 rounded-lg p-3">
+                    <h4 class="text-sm font-semibold text-green-400 mb-2"><i class="fas fa-bolt mr-1"></i>Burst Mode</h4>
+                    <ul class="text-slate-400 space-y-1">
+                      <li>• Transfiere todo el bloque seguido</li>
+                      <li>• CPU no puede usar el bus</li>
+                      <li>• Más rápido</li>
+                      <li>• Puede causar latencia</li>
+                    </ul>
+                  </div>
+                  <div class="bg-yellow-900/30 border border-yellow-600/50 rounded-lg p-3">
+                    <h4 class="text-sm font-semibold text-yellow-400 mb-2"><i class="fas fa-hand-paper mr-1"></i>Cycle Stealing</h4>
+                    <ul class="text-slate-400 space-y-1">
+                      <li>• Roba ciclos al CPU</li>
+                      <li>• interleaved con CPU</li>
+                      <li>• Balance velocidad/CPU</li>
+                      <li>• Más común</li>
+                    </ul>
+                  </div>
+                  <div class="bg-blue-900/30 border border-blue-600/50 rounded-lg p-3">
+                    <h4 class="text-sm font-semibold text-blue-400 mb-2"><i class="fas fa-shield-alt mr-1"></i>Transparent Mode</h4>
+                    <ul class="text-slate-400 space-y-1">
+                      <li>• Solo cuando CPU no usa bus</li>
+                      <li>• Sin interferencia</li>
+                      <li>• Más lento</li>
+                      <li>• Eficiencia garantizada</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Señales DMA -->
+              <div class="bg-slate-800/60 border border-slate-600 rounded-xl p-4 mb-8">
+                <h3 class="text-base font-semibold text-pink-300 mb-3 flex items-center gap-2">
+                  <i class="fas fa-plug mr-2"></i>Señales DMA
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                  <div>
+                    <h4 class="text-sm font-semibold text-cyan-400 mb-2">Señales del Dispositivo</h4>
+                    <div class="space-y-2">
+                      <div class="bg-slate-900/50 p-2 rounded border border-slate-700">
+                        <span class="text-yellow-400 font-bold">DRQ (DMA Request):</span>
+                        <span class="text-slate-400 ml-2">Dispositivo solicita usar el bus</span>
+                      </div>
+                      <div class="bg-slate-900/50 p-2 rounded border border-slate-700">
+                        <span class="text-green-400 font-bold">DACK (DMA Acknowledge):</span>
+                        <span class="text-slate-400 ml-2">DMA confirma acceso al bus</span>
+                      </div>
+                      <div class="bg-slate-900/50 p-2 rounded border border-slate-700">
+                        <span class="text-red-400 font-bold">TC (Terminal Count):</span>
+                        <span class="text-slate-400 ml-2">Transferencia completada</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-semibold text-cyan-400 mb-2">Señales CPU ↔ DMA</h4>
+                    <div class="space-y-2">
+                      <div class="bg-slate-900/50 p-2 rounded border border-slate-700">
+                        <span class="text-yellow-400 font-bold">HOLD:</span>
+                        <span class="text-slate-400 ml-2">DMA pide controlar el bus</span>
+                      </div>
+                      <div class="bg-slate-900/50 p-2 rounded border border-slate-700">
+                        <span class="text-green-400 font-bold">HLDA (Hold Acknowledge):</span>
+                        <span class="text-slate-400 ml-2">CPU libera el bus</span>
+                      </div>
+                      <div class="bg-slate-900/50 p-2 rounded border border-slate-700">
+                        <span class="text-purple-400 font-bold">IRQ:</span>
+                        <span class="text-slate-400 ml-2">DMA notifica fin a CPU</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Diferencia con I/O Programado -->
+              <div class="bg-slate-800/60 border border-slate-600 rounded-xl p-4 mb-8">
+                <h3 class="text-base font-semibold text-orange-300 mb-3 flex items-center gap-2">
+                  <i class="fas fa-balance-scale mr-2"></i>DMA vs I/O Programado
+                </h3>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-xs">
+                    <thead>
+                      <tr class="border-b border-slate-600">
+                        <th class="text-left py-2 px-2 text-slate-400">Aspecto</th>
+                        <th class="text-center py-2 px-2 text-red-400">I/O Programado</th>
+                        <th class="text-center py-2 px-2 text-green-400">DMA</th>
+                      </tr>
+                    </thead>
+                    <tbody class="text-slate-300">
+                      <tr class="border-b border-slate-700">
+                        <td class="py-2 px-2 font-semibold">Participación CPU</td>
+                        <td class="text-center py-2 px-2"><span class="bg-red-500/20 text-red-300 px-2 py-0.5 rounded">100%</span></td>
+                        <td class="text-center py-2 px-2"><span class="bg-green-500/20 text-green-300 px-2 py-0.5 rounded">&lt; 1%</span></td>
+                      </tr>
+                      <tr class="border-b border-slate-700">
+                        <td class="py-2 px-2 font-semibold">Ciclos por byte</td>
+                        <td class="text-center py-2 px-2">~15 ciclos</td>
+                        <td class="text-center py-2 px-2">~0.05 ciclos</td>
+                      </tr>
+                      <tr class="border-b border-slate-700">
+                        <td class="py-2 px-2 font-semibold">Transferencia 1MB</td>
+                        <td class="text-center py-2 px-2">~15M ciclos CPU</td>
+                        <td class="text-center py-2 px-2">~200 ciclos setup</td>
+                      </tr>
+                      <tr class="border-b border-slate-700">
+                        <td class="py-2 px-2 font-semibold">Bloqueo CPU</td>
+                        <td class="text-center py-2 px-2"><span class="text-red-400">Sí</span></td>
+                        <td class="text-center py-2 px-2"><span class="text-green-400">No</span></td>
+                      </tr>
+                      <tr>
+                        <td class="py-2 px-2 font-semibold">Uso típico</td>
+                        <td class="text-center py-2 px-2">Dispositivos lentos</td>
+                        <td class="text-center py-2 px-2">SSD, Red, Audio, GPU</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Selector de modo y controles -->
+              <div class="bg-slate-900 rounded-xl p-6 border border-slate-700 mb-6">
+                <div class="flex flex-col md:flex-row gap-4 mb-6 justify-center items-center">
+                  <div class="flex gap-3">
+                    <button id="btn-dma-cpu" class="bg-red-900/50 hover:bg-red-800/80 border-2 border-red-500 text-red-200 px-5 py-3 rounded-lg font-bold transition-all text-sm" onclick="dmaStartSimulation('cpu')">
+                      <i class="fas fa-person-walking mr-2"></i>Transferencia vía CPU
+                    </button>
+                    <button id="btn-dma-dma" class="bg-green-900/50 hover:bg-green-800/80 border-2 border-green-500 text-green-200 px-5 py-3 rounded-lg font-bold transition-all text-sm" onclick="dmaStartSimulation('dma')">
+                      <i class="fas fa-rocket mr-2"></i>Transferencia vía DMA
+                    </button>
+                  </div>
+                  <div class="text-xs text-slate-400 bg-slate-800 px-4 py-2 rounded-full border border-slate-600">
+                    <i class="fas fa-keyboard mr-1"></i> O presiona <kbd class="bg-slate-700 px-2 py-0.5 rounded text-slate-300 font-mono">ESPACIO</kbd> para iniciar
+                  </div>
+                </div>
+
+                <!-- Indicador de modo activo -->
+                <div id="dma-mode-indicator" class="text-center text-sm text-slate-500 mb-4">
+                  Selecciona un modo para comenzar la simulación
+                </div>
+
+                <!-- Diagrama principal -->
+                <div class="relative w-full max-w-3xl mx-auto bg-slate-800/40 rounded-xl border border-slate-700 p-4" id="dma-diagram" style="min-height: 320px;">
+                  <!-- Canvas para la animación -->
+                  <canvas id="dma-canvas" role="img" aria-label="Diagrama de transferencia DMA" class="w-full rounded-lg" height="280"></canvas>
+                </div>
+
+                <!-- Pasos del proceso DMA -->
+                <div id="dma-steps" class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-6">
+                  <div class="dma-step bg-slate-800/60 border border-slate-700 rounded-lg p-3 text-center transition-all" data-step="1">
+                    <div class="text-2xl mb-1 text-slate-600"><i class="fas fa-handshake"></i></div>
+                    <div class="text-xs font-bold text-slate-400">1. Solicitud (DRQ)</div>
+                    <div class="text-[10px] text-slate-500 mt-1">El dispositivo I/O envía señal DRQ al controlador DMA</div>
+                  </div>
+                  <div class="dma-step bg-slate-800/60 border border-slate-700 rounded-lg p-3 text-center transition-all" data-step="2">
+                    <div class="text-2xl mb-1 text-slate-600"><i class="fas fa-unlock"></i></div>
+                    <div class="text-xs font-bold text-slate-400">2. Concesión (HOLD/HLDA)</div>
+                    <div class="text-[10px] text-slate-500 mt-1">DMA envía HOLD, CPU responde HLDA y libera el bus</div>
+                  </div>
+                  <div class="dma-step bg-slate-800/60 border border-slate-700 rounded-lg p-3 text-center transition-all" data-step="3">
+                    <div class="text-2xl mb-1 text-slate-600"><i class="fas fa-exchange-alt"></i></div>
+                    <div class="text-xs font-bold text-slate-400">3. Transferencia por Bus</div>
+                    <div class="text-[10px] text-slate-500 mt-1">DMA controla el bus y transfiere bloques I/O ↔ RAM</div>
+                  </div>
+                  <div class="dma-step bg-slate-800/60 border border-slate-700 rounded-lg p-3 text-center transition-all" data-step="4">
+                    <div class="text-2xl mb-1 text-slate-600"><i class="fas fa-flag-checkered"></i></div>
+                    <div class="text-xs font-bold text-slate-400">4. Finalización (TC + IRQ)</div>
+                    <div class="text-[10px] text-slate-500 mt-1">DMA envía TC al I/O, libera el bus, y envía IRQ al CPU</div>
+                  </div>
+                </div>
+
+                <!-- Métricas comparativas -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                  <div class="bg-slate-800 border border-slate-700 rounded-lg p-3 text-center">
+                    <div class="text-xs text-slate-400 mb-1">Bloques transferidos</div>
+                    <div id="dma-blocks" class="text-xl font-bold text-brand-400 font-mono">0 / 16</div>
+                  </div>
+                  <div class="bg-slate-800 border border-slate-700 rounded-lg p-3 text-center">
+                    <div class="text-xs text-slate-400 mb-1">Ciclos de CPU usados</div>
+                    <div id="dma-cycles" class="text-xl font-bold text-blue-400 font-mono">0</div>
+                  </div>
+                  <div class="bg-slate-800 border border-slate-700 rounded-lg p-3 text-center">
+                    <div class="text-xs text-slate-400 mb-1">Tiempo transcurrido</div>
+                    <div id="dma-time" class="text-xl font-bold text-purple-400 font-mono">0 ms</div>
+                  </div>
+                  <div class="bg-slate-800 border border-slate-700 rounded-lg p-3 text-center">
+                    <div class="text-xs text-slate-400 mb-1">Carga del CPU</div>
+                    <div id="dma-cpu-load" class="text-xl font-bold text-green-400 font-mono">5%</div>
+                  </div>
+                </div>
+
+                <!-- Resultado -->
+                <div id="dma-result" class="text-center mt-4 h-8 text-base font-semibold"></div>
+              </div>
+
+              <!-- Comparación real de rendimiento -->
+              <div class="bg-slate-900/60 rounded-xl p-6 border border-slate-700">
+                <h3 class="font-bold text-slate-200 mb-4 flex items-center gap-2"><i class="fas fa-chart-bar text-brand-400"></i> Comparación real de rendimiento (transferencia de 1 MB)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="bg-red-950/30 border border-red-800/50 rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-3">
+                      <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                      <span class="font-bold text-red-300 text-sm">Programmed I/O (CPU)</span>
+                    </div>
+                    <div class="space-y-2 text-xs text-slate-300">
+                      <div class="flex justify-between"><span>CPU involucrado:</span><span class="text-red-400 font-bold">100% del tiempo</span></div>
+                      <div class="flex justify-between"><span>Ciclos por byte:</span><span class="font-mono">~15 ciclos</span></div>
+                      <div class="flex justify-between"><span>Ciclos totales (1 MB):</span><span class="font-mono">~15.7 millones</span></div>
+                      <div class="flex justify-between"><span>A 4 GHz:</span><span class="text-red-400 font-bold">~3.9 ms</span></div>
+                    </div>
+                    <div class="mt-3 h-3 bg-slate-800 rounded-full overflow-hidden">
+                      <div class="h-full bg-red-500 rounded-full" style="width: 100%"></div>
+                    </div>
+                    <div class="text-[10px] text-red-400 mt-1 text-right">CPU bloqueado</div>
+                  </div>
+                  <div class="bg-green-950/30 border border-green-800/50 rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-3">
+                      <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span class="font-bold text-green-300 text-sm">DMA</span>
+                    </div>
+                    <div class="space-y-2 text-xs text-slate-300">
+                      <div class="flex justify-between"><span>CPU involucrado:</span><span class="text-green-400 font-bold">Solo setup + IRQ</span></div>
+                      <div class="flex justify-between"><span>Ciclos por byte:</span><span class="font-mono">~1 ciclo (bus)</span></div>
+                      <div class="flex justify-between"><span>Ciclos CPU usados:</span><span class="font-mono">~200 (setup)</span></div>
+                      <div class="flex justify-between"><span>A 4 GHz:</span><span class="text-green-400 font-bold">CPU libre 99.9%</span></div>
+                    </div>
+                    <div class="mt-3 h-3 bg-slate-800 rounded-full overflow-hidden">
+                      <div class="h-full bg-green-500 rounded-full" style="width: 3%"></div>
+                    </div>
+                    <div class="text-[10px] text-green-400 mt-1 text-right">CPU casi libre</div>
+                  </div>
+                </div>
+              </div>
+              </div>
+            <div class="mt-8 flex justify-between">
+              <button class="text-slate-400 hover:text-white transition" onclick="navegarA('interrupciones')"><i class="fas fa-arrow-left mr-2"></i> Anterior</button>
+              <button class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded font-semibold transition" onclick="navegarA('buses')">Siguiente: Buses <i class="fas fa-arrow-right ml-2"></i></button>
+            </div>
+      </div>
+
+          <!-- ================= SECCIÓN 3: BUSES ================= -->
+      <div id="buses" class="level-content" role="tabpanel" aria-labelledby="tab-buses">
+            <div class="p-4 rounded-xl">
+            <h2 class="text-3xl font-bold mb-4 flex items-center gap-3"><i class="fas fa-network-wired text-brand-400"></i> Jerarquía de Buses</h2>
+            <p class="text-lg text-slate-300 mb-6">
+              Los buses son los canales de comunicación que transportan datos entre los componentes del computador. En arquitecturas modernas, se organizan en una jerarquía según su velocidad y cercanía a la CPU.
+            </p>
+
+            <div class="bg-slate-800/60 p-6 rounded-xl border border-slate-700 mb-8">
+              <h3 class="text-xl font-bold text-orange-400 mb-4 flex items-center gap-2">
+                <i class="fas fa-question-circle"></i> <strong class="text-orange-400">¿Por qué existe una jerarquía?</strong>
+              </h3>
+              <p class="text-white mb-4">
+                Porque hay una gran diferencia entre la velocidad de la CPU y la de los dispositivos.
+              </p>
+              <p class="text-slate-300 mb-2"><strong class="text-green-400">Entonces:</strong></p>
+              <ul class="text-slate-300 space-y-2">
+                <li><i class="fas fa-arrow-right text-blue-400 mr-2"></i><strong class="text-blue-400">Componentes cercanos</strong> → más rápidos</li>
+                <li><i class="fas fa-arrow-right text-purple-400 mr-2"></i><strong class="text-purple-400">Componentes lejanos</strong> → más lentos</li>
+              </ul>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <!-- Diagrama interactivo con Canvas -->
+              <div class="lg:col-span-2 bg-slate-800/60 p-6 rounded-xl border border-slate-700">
+                <h3 class="font-semibold text-slate-300 mb-4"><i class="fas fa-cube text-brand-400 mr-2"></i>Arquitectura Típica Moderna</h3>
+                <div class="bg-slate-900 rounded-lg border border-slate-700 overflow-hidden">
+                  <canvas id="architecture-canvas" role="img" aria-label="Diagrama de jerarquia de buses" class="w-full" height="500"></canvas>
+                </div>
+            <p class="text-xs text-slate-400 mt-3"><i class="fas fa-mouse"></i> Situa el ratón sobre los componentes para verlos resaltados. Haz clic en los buses para más detalles.</p>
+              </div>
+
+              <!-- Panel de Info (Sidebar) -->
+              <div class="bg-slate-900 p-6 rounded-xl border border-slate-700 flex flex-col justify-start sticky top-24">
+                <h3 class="text-lg font-bold text-brand-400 mb-4 flex items-center gap-2">
+                  <i class="fas fa-info-circle"></i> Información del Bus
+                </h3>
+                <div id="bus-info-panel" class="text-center">
+                  <i class="fas fa-hand-pointer text-3xl text-slate-600 mb-4 animate-bounce inline-block"></i>
+                  <p class="text-slate-400 mt-2 text-sm">Selecciona un bus en el diagrama</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Explicación: Root Port vs Switch (ABAJO de la navegación) -->
+            <div class="bg-slate-800/60 p-6 rounded-xl border border-slate-700 mt-8">
+              <h3 class="text-xl font-bold text-brand-400 mb-4 flex items-center gap-2">
+                <i class="fas fa-project-diagram"></i> PCIe Root Port vs Switch
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-slate-900/60 p-4 rounded-lg border border-blue-500/30">
+                  <h4 class="text-lg font-semibold text-blue-400 mb-3">
+                    <i class="fas fa-anchor mr-2"></i>Root Port (Puerto Raíz)
+                  </h4>
+                  <ul class="text-slate-300 text-sm space-y-2">
+                    <li><strong class="text-blue-300">• Definición:</strong> Punto de conexión principal del Root Complex (CPU/Chipset) al bus PCIe.</li>
+                    <li><strong class="text-blue-300">• Función:</strong> Origina transacciones PCIe, es el "dueño" del bus.</li>
+                    <li><strong class="text-blue-300">• Relación:</strong> Un CPU tiene varios Root Ports (ej: x16, x4, x1).</li>
+                    <li><strong class="text-blue-300">• Analogía:</strong> Es como el puerto principal de un concentrador eléctrico.</li>
+                  </ul>
+                </div>
+                <div class="bg-slate-900/60 p-4 rounded-lg border border-green-500/30">
+                  <h4 class="text-lg font-semibold text-green-400 mb-3">
+                    <i class="fas fa-random mr-2"></i>PCIe Switch
+                  </h4>
+                  <ul class="text-slate-300 text-sm space-y-2">
+                    <li><strong class="text-green-300">• Definición:</strong> Dispositivo que conecta múltiples buses PCIe, permitiendo compartir enlaces.</li>
+                    <li><strong class="text-green-300">• Función:</strong> Dirige tráfico entre dispositivos conectados, como un switch de red.</li>
+                    <li><strong class="text-green-300">• Uso:</strong> Permite conectar varias GPUs o SSDs a un solo slot x16.</li>
+                    <li><strong class="text-green-300">• Analogía:</strong> Es como un multiplexor que divide un camino en varios.</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="mt-4 p-3 bg-slate-900/40 rounded-lg border border-slate-600">
+                <p class="text-slate-300 text-sm text-center">
+                  <strong class="text-yellow-400">En resumen:</strong> El <span class="text-blue-400">Root Port</span> es el origen (donde nace el bus), y el <span class="text-green-400">Switch</span> es el distribuidor que divide ese bus en múltiples conexiones.
+                </p>
+              </div>
+            </div>
+
+            <!-- Tipos de Buses -->
+            <div class="bg-slate-800/60 p-6 rounded-xl border border-slate-700 mt-8">
+              <h3 class="text-xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                <i class="fas fa-sitemap mr-2"></i>Tipos de Buses
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-blue-900/30 border border-blue-600/50 rounded-lg p-4">
+                  <h4 class="text-sm font-semibold text-blue-400 mb-2"><i class="fas fa-microchip mr-1"></i>Buses del Sistema</h4>
+                  <ul class="text-xs text-slate-400 space-y-1">
+                    <li><strong class="text-white">FSB</strong> (Front Side Bus) - Legacy Intel</li>
+                    <li><strong class="text-white">QPI</strong> (QuickPath Interconnect) - Intel</li>
+                    <li><strong class="text-white">DMI</strong> (Direct Media Interface) - CPU↔PCH</li>
+                    <li><strong class="text-white">Infinity Fabric</strong> - AMD</li>
+                  </ul>
+                </div>
+                <div class="bg-green-900/30 border border-green-600/50 rounded-lg p-4">
+                  <h4 class="text-sm font-semibold text-green-400 mb-2"><i class="fas fa-expand mr-1"></i>Buses de Expansión</h4>
+                  <ul class="text-xs text-slate-400 space-y-1">
+                    <li><strong class="text-white">PCI</strong> (32-bit, paralelo)</li>
+                    <li><strong class="text-white">PCIe</strong> (serie, lanes)</li>
+                    <li><strong class="text-white">AGP</strong> - Gráficos legacy</li>
+                    <li><strong class="text-white">Thunderbolt</strong> - Intel</li>
+                  </ul>
+                </div>
+                <div class="bg-yellow-900/30 border border-yellow-600/50 rounded-lg p-4">
+                  <h4 class="text-sm font-semibold text-yellow-400 mb-2"><i class="fas fa-usb mr-1"></i>Buses Periféricos</h4>
+                  <ul class="text-xs text-slate-400 space-y-1">
+                    <li><strong class="text-white">USB</strong> (Universal Serial Bus)</li>
+                    <li><strong class="text-white">SATA</strong> (discos, legacy)</li>
+                    <li><strong class="text-white">NVMe</strong> (SSD PCIe)</li>
+                    <li><strong class="text-white">I2C</strong> (embedded)</li>
+                  </ul>
+                </div>
+                <div class="bg-purple-900/30 border border-purple-600/50 rounded-lg p-4">
+                  <h4 class="text-sm font-semibold text-purple-400 mb-2"><i class="fas fa-memory mr-1"></i>Buses de Memoria</h4>
+                  <ul class="text-xs text-slate-400 space-y-1">
+                    <li><strong class="text-white">DDR</strong> (System RAM)</li>
+                    <li><strong class="text-white">GDDR</strong> (Graphics RAM)</li>
+                    <li><strong class="text-white">HBM</strong> (High Bandwidth Memory)</li>
+                    <li><strong class="text-white">GDDR7</strong> (2026)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Protocolos de Comunicación -->
+            <div class="bg-slate-800/60 p-6 rounded-xl border border-slate-700 mt-8">
+              <h3 class="text-xl font-bold text-pink-400 mb-4 flex items-center gap-2">
+                <i class="fas fa-exchange-alt mr-2"></i>Protocolos de Comunicación
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-red-900/30 border border-red-600/50 rounded-lg p-4">
+                  <h4 class="text-sm font-semibold text-red-400 mb-2">Por Tipo de Señal</h4>
+                  <div class="space-y-2 text-xs">
+                    <div class="bg-slate-900/50 p-2 rounded">
+                      <span class="text-white font-semibold">Paralelo:</span>
+                      <span class="text-slate-400"> Múltiples bits simultáneamente (8, 16, 32)</span>
+                      <div class="text-slate-500 text-[10px] mt-1">Ej: PCI, DDR antigua, FSB</div>
+                    </div>
+                    <div class="bg-slate-900/50 p-2 rounded">
+                      <span class="text-white font-semibold">Serie (Serial):</span>
+                      <span class="text-slate-400"> 1 bit a la vez, alta velocidad</span>
+                      <div class="text-slate-500 text-[10px] mt-1">Ej: PCIe, USB, SATA</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="bg-cyan-900/30 border border-cyan-600/50 rounded-lg p-4">
+                  <h4 class="text-sm font-semibold text-cyan-400 mb-2">Por Dirección</h4>
+                  <div class="space-y-2 text-xs">
+                    <div class="bg-slate-900/50 p-2 rounded">
+                      <span class="text-white font-semibold">Half-duplex:</span>
+                      <span class="text-slate-400"> Envía o recibe, no ambos</span>
+                      <div class="text-slate-500 text-[10px] mt-1">Ej: old USB, I2C</div>
+                    </div>
+                    <div class="bg-slate-900/50 p-2 rounded">
+                      <span class="text-white font-semibold">Full-duplex:</span>
+                      <span class="text-slate-400"> Envía y recibe a la vez</span>
+                      <div class="text-slate-500 text-[10px] mt-1">Ej: PCIe, Ethernet</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 bg-yellow-900/30 border border-yellow-600/50 rounded-lg p-4">
+                <h4 class="text-sm font-semibold text-yellow-400 mb-2">Señales del Bus</h4>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                  <div class="bg-slate-900/50 p-2 rounded text-center">
+                    <span class="text-blue-400 font-bold">DATA</span>
+                    <div class="text-slate-500">Datos</div>
+                  </div>
+                  <div class="bg-slate-900/50 p-2 rounded text-center">
+                    <span class="text-yellow-400 font-bold">ADDR</span>
+                    <div class="text-slate-500">Dirección</div>
+                  </div>
+                  <div class="bg-slate-900/50 p-2 rounded text-center">
+                    <span class="text-green-400 font-bold">CLK</span>
+                    <div class="text-slate-500">Reloj</div>
+                  </div>
+                  <div class="bg-slate-900/50 p-2 rounded text-center">
+                    <span class="text-red-400 font-bold">CTRL</span>
+                    <div class="text-slate-500">Control</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Arbitraje del Bus -->
+            <div class="bg-slate-800/60 p-6 rounded-xl border border-slate-700 mt-8">
+              <h3 class="text-xl font-bold text-orange-400 mb-4 flex items-center gap-2">
+                <i class="fas fa-gavel mr-2"></i>Arbitraje del Bus
+              </h3>
+              <p class="text-slate-300 text-sm mb-4">
+                Cuando múltiples dispositivos quieren usar el bus al mismo tiempo, se necesita un mecanismo para decidir quién tiene acceso.
+              </p>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="bg-blue-900/30 border border-blue-600/50 rounded-lg p-3">
+                  <h4 class="text-sm font-semibold text-blue-400 mb-2">Daisy Chain</h4>
+                  <ul class="text-xs text-slate-400 space-y-1">
+                    <li>• Prioridad por posición física</li>
+                    <li>• Dispositivo más cercano = mayor prioridad</li>
+                    <li>• Simple pero no configurable</li>
+                  </ul>
+                </div>
+                <div class="bg-green-900/30 border border-green-600/50 rounded-lg p-3">
+                  <h4 class="text-sm font-semibold text-green-400 mb-2">Priority Based</h4>
+                  <ul class="text-xs text-slate-400 space-y-1">
+                    <li>• priority configurable</li>
+                    <li>• Dispositivos críticos primero</li>
+                    <li>• Programable</li>
+                  </ul>
+                </div>
+                <div class="bg-purple-900/30 border border-purple-600/50 rounded-lg p-3">
+                  <h4 class="text-sm font-semibold text-purple-400 mb-2">Round Robin</h4>
+                  <ul class="text-xs text-slate-400 space-y-1">
+                    <li>• Turnos rotativos</li>
+                    <li>• Fairness garantizado</li>
+                    <li>• Sin inanición</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="mt-4 p-3 bg-slate-900/50 rounded-lg border border-slate-600">
+                <h4 class="text-sm font-semibold text-cyan-400 mb-2">PCIe: Credit-Based Flow Control</h4>
+                <p class="text-xs text-slate-400">
+                  PCIe no usa arbitraje tradicional. Usa <span class="text-yellow-400">flow control credits</span>: cada dispositivo tiene "créditos" para enviar paquetes. Se renuevan cuando el receptor confirma recepción. Esto evita perdido y elimina necesidad de arbitraje.
+                </p>
+              </div>
+            </div>
+            <div class="mt-8 flex justify-between">
+              <button class="text-slate-400 hover:text-white transition" onclick="navegarA('dma')"><i class="fas fa-arrow-left mr-2"></i> Anterior</button>
+              <button class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded font-semibold transition" onclick="navegarA('avances')">Siguiente: Avances <i class="fas fa-arrow-right ml-2"></i></button>
+            </div>
+          </div>
+      </div>
+
+          <!-- ================= SECCIÓN: AVANCES ================= -->
+      <div id="avances" class="level-content" role="tabpanel" aria-labelledby="tab-avances">
+            <div class="p-4 rounded-xl">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+              <i class="fas fa-rocket text-brand-400"></i> 
+              Avances Tecnológicos 2026
+            </h2>
+
+            <!-- Introducción: ¿Qué es PCIe? -->
+            <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-600 mb-4">
+              <h3 class="text-lg font-semibold text-blue-400 mb-2">
+                <i class="fas fa-info-circle mr-2"></i>¿Qué es PCIe? (Peripheral Component Interconnect Express / Interconexión de Componentes Periféricos Express)
+              </h3>
+              <div class="flex gap-4 items-start">
+                <p class="text-slate-300 text-sm flex-1">
+                  <strong>PCI Express (PCIe)</strong> es un bus de comunicación serie de alta velocidad que conecta componentes dentro del computadora. 
+                  Utiliza un esquema de <strong>lanes</strong> (caminos de datos): un slot x1 tiene 1 lane, x4 tiene 4, x8 tiene 8 y x16 tiene 16. 
+                  A más lanes, mayor ancho de banda. Es el estándar principal para GPUs, SSDs NVMe y tarjetas de expansión en 2026.
+                </p>
+                <div class="relative inline-block group cursor-pointer flex-shrink-0" title="Ver gráfico de velocidades" onclick="abrirImagen('img/PCIe.gif')">
+                  <i class="fas fa-eye text-slate-400 text-xl hover:text-cyan-400 transition"></i>
+                  <div class="absolute z-[999] hidden group-hover:block right-0 mt-2 w-[500px] p-2 bg-slate-900 rounded-lg border border-cyan-500 shadow-lg shadow-cyan-500/30 pointer-events-none">
+                    <img src="img/PCIe.gif" alt="PCIe Animation" class="w-full max-h-64 object-contain rounded">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+              <!-- Introducción: ¿Qué es USB? -->
+              <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-600 mb-4">
+                <h3 class="text-lg font-semibold text-green-400 mb-2">
+                  <i class="fas fa-plug mr-2"></i>¿Qué es USB?
+                </h3>
+                <div class="flex gap-4 items-start">
+                  <div class="flex-1">
+                    <p class="text-slate-300 text-sm mb-2">
+                      <strong>USB (Universal Serial Bus)</strong> es el estándar de conectividad más utilizado para conectar periféricos externos a una computadora. 
+                      Fue creado para simplificar la conexión de dispositivos como teclados, mouse, impresoras, discos externos y cargadores.
+                    </p>
+                    <p class="text-slate-300 text-xs mb-2">
+                      <strong>Thunderbolt:</strong> Desarrollado inicialmente por <span class="text-yellow-400 font-semibold">Intel</span> en colaboración con <span class="text-yellow-400 font-semibold">Apple</span> (primera en implementarlo en Mac en 2011), combina PCIe y DisplayPort en un solo cable. Thunderbolt 5 alcanza 80 Gbps, el mismo rendimiento que USB4 v2.
+                    </p>
+                    <p class="text-slate-300 text-xs mb-2">
+                      <strong>Apple y Thunderbolt:</strong> Apple sigue siendo muy "celosa" con Thunderbolt. En los MacBook Pro con <span class="text-yellow-400 font-semibold">M5 Pro y M5 Max (2026)</span> implementa Thunderbolt 5 con controladores propios integrados en el chip, ofreciendo una de las versiones más potentes y estables del mercado (soporte para más monitores externos, mejor ancho de banda por puerto). Los modelos base (como MacBook Air M5) siguen en Thunderbolt 4 / USB4 de 40 Gbps.
+                    </p>
+                    <p class="text-slate-400 text-xs">
+                      <strong>Importancia:</strong> En 2026, USB4 v2 alcanza <span class="text-green-400 font-bold">80 Gbps</span>, rivalizando con PCIe en velocidad pero manteniendo la facilidad de uso hot-plug (conectar sin apagar el equipo).
+                    </p>
+                  </div>
+                  <div class="relative inline-block group cursor-pointer flex-shrink-0 self-start" title="Ver gráfico de velocidades" onclick="abrirImagen('img/USB.jpg')">
+                    <i class="fas fa-eye text-slate-400 text-xl hover:text-cyan-400 transition"></i>
+                    <div class="absolute z-[999] hidden group-hover:block right-0 mt-2 w-[500px] p-2 bg-slate-900 rounded-lg border border-cyan-500 shadow-lg shadow-cyan-500/30 pointer-events-none">
+                      <img src="img/USB.jpg" alt="USB" class="w-full max-h-64 object-contain rounded">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Introducción: ¿Qué es CXL? -->
+              <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-600 mb-6">
+                <h3 class="text-lg font-semibold text-purple-400 mb-2">
+                  <i class="fas fa-brain mr-2"></i>¿Qué es CXL?
+                </h3>
+                <div class="flex gap-4 items-start">
+                  <div class="flex-1">
+                    <p class="text-slate-300 text-sm mb-2">
+                      <strong>CXL (Compute Express Link)</strong> es una tecnología de interconexión de alta velocidad diseñada para centros de datos. 
+                      Permite conectar CPUs, GPUs, aceleradores y memoria de manera coherente, compartiendo datos sin copias intermedias.
+                    </p>
+                <p class="text-slate-400 text-xs">
+                  <strong>Importancia:</strong> En 2026, CXL 4.0 alcanza <span class="text-purple-400 font-bold">128 GT/s</span>, habilitando memoria compartida entre múltiples dispositivos para workloads de IA.
+                </p>
+                <p class="text-slate-400 text-xs mt-2">
+                  <strong>Origen:</strong> CXL fue desarrollado inicialmente por <strong>Intel</strong>, quien donó la tecnología al <strong>CXL Consortium</strong> en 2019 para convertirla en un estándar abierto.
+                </p>
+                <p class="text-slate-400 text-xs mt-1">
+                      <strong>Gobierno:</strong> Al igual que PCIe o USB, ninguna empresa es dueña exclusiva de CXL. Es gobernado por el Consortium (donde participan Intel, AMD, NVIDIA, Google, Microsoft, etc.), y cualquier compañía puede implementarlo de forma interoperable.
+                    </p>
+                  </div>
+                  <div class="relative inline-block group cursor-pointer flex-shrink-0 self-start" title="Ver diagrama CXL" onclick="abrirImagen('img/CXL.jpg')">
+                    <i class="fas fa-eye text-slate-400 text-xl hover:text-cyan-400 transition"></i>
+                    <div class="absolute z-[999] hidden group-hover:block right-0 mt-2 w-[500px] p-2 bg-slate-900 rounded-lg border border-cyan-500 shadow-lg shadow-cyan-500/30 pointer-events-none">
+                      <img src="img/CXL.jpg" alt="CXL" class="w-full max-h-64 object-contain rounded">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <!-- Card 1: PCIe 5.0 -->
+                <div class="group bg-slate-800/80 hover:bg-slate-700/80 border border-slate-600 hover:border-blue-400 rounded-xl p-6 transition-all duration-300">
+                  <div class="text-4xl text-blue-400 mb-4 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-microchip"></i>
+                  </div>
+                  <h3 class="text-2xl font-bold text-blue-400 mb-3">PCIe 5.0</h3>
+                  <p class="text-slate-300 text-sm mb-2">
+                    <strong>64 GT/s</strong> | ~128 GB/s bidireccional (x16)
+                  </p>
+                  <p class="text-slate-300 text-sm">
+                    Señalización NRZ, 32 GT/s por lane. Estándar en SSDs NVMe Gen5 actuales.
+                  </p>
+                </div>
+
+                <!-- Card 2: PCIe 6.0 -->
+                <div class="group bg-slate-800/80 hover:bg-slate-700/80 border border-slate-600 hover:border-cyan-400 rounded-xl p-6 transition-all duration-300">
+                  <div class="text-4xl text-cyan-400 mb-4 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-bolt"></i>
+                  </div>
+                  <h3 class="text-2xl font-bold text-cyan-400 mb-3">PCIe 6.0</h3>
+                  <p class="text-slate-300 text-sm mb-2">
+                    <strong>128 GT/s</strong> | ~256 GB/s bidireccional (x16)
+                  </p>
+                  <p class="text-slate-300 text-sm">
+                    Utiliza señalización <strong>PAM4</strong> y Forward Error Correction para mantener alta velocidad con robustez.
+                  </p>
+                </div>
+
+                <!-- Card 3: PCIe 7.0 -->
+                <div class="group bg-slate-800/80 hover:bg-slate-700/80 border border-slate-600 hover:border-yellow-400 rounded-xl p-6 transition-all duration-300">
+                  <div class="text-4xl text-yellow-400 mb-4 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-star"></i>
+                  </div>
+                  <h3 class="text-2xl font-bold text-yellow-400 mb-3">PCIe 7.0</h3>
+                  <p class="text-slate-300 text-sm mb-2">
+                    <strong>256 GT/s</strong> | ~512 GB/s bidireccional (x16)
+                  </p>
+                  <p class="text-slate-300 text-sm">
+                    Liberado <strong>junio 2025</strong> por PCI-SIG. Enfocado en IA y HPC. Usa PAM4 mejorado con FLIT encoding y FEC avanzado.
+                  </p>
+                </div>
+
+                <!-- Card 4: USB4 -->
+                <div class="group bg-slate-800/80 hover:bg-slate-700/80 border border-slate-600 hover:border-green-400 rounded-xl p-6 transition-all duration-300">
+                  <div class="text-4xl text-green-400 mb-4 group-hover:scale-110 transition-transform">
+                    <i class="fab fa-usb"></i>
+                  </div>
+                  <h3 class="text-2xl font-bold text-green-400 mb-3">USB4 v2 / TB5</h3>
+                  <p class="text-slate-300 text-sm mb-4">
+                    <strong>Comparación:</strong><br>
+                    USB4 v1 / TB4: 40 Gbps<br>
+                    <span class="text-green-400 font-semibold">USB4 v2 / TB5 (2026):</span> <strong>80 Gbps</strong> (hasta 120 Gbps asimétrico en algunos dispositivos)
+                  </p>
+                  <p class="text-slate-300 text-sm">
+                    Un solo cable Tipo-C para datos, video 8K/16K y carga de hasta <strong>240W</strong>.
+                  </p>
+                </div>
+
+                <!-- Card 5: CXL -->
+                <div class="group bg-slate-800/80 hover:bg-slate-700/80 border border-slate-600 hover:border-purple-400 rounded-xl p-6 transition-all duration-300">
+                  <div class="text-4xl text-purple-400 mb-4 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-brain"></i>
+                  </div>
+                  <h3 class="text-2xl font-bold text-purple-400 mb-3">CXL 4.0</h3>
+                  <p class="text-slate-300 text-sm mb-4">
+                    <strong>Comparación:</strong><br>
+                    CXL 2.0 (2022): Pooling básico<br>
+                    CXL 3.0 (2024): 64 GT/s + Fabric<br>
+                    <span class="text-purple-400 font-semibold">CXL 4.0 (2025-2026):</span> Hasta <strong>128 GT/s</strong> + mejor memoria compartida
+                  </p>
+                  <p class="text-slate-300 text-sm">
+                    Permite coherencia de caché entre CPU, GPU y aceleradores, ideal para IA y Memory Pooling.
+                  </p>
+                </div>
+
+                <!-- Card 6: I/O Inteligente -->
+              <div class="group bg-slate-800/80 hover:bg-slate-700/80 border border-slate-600 hover:border-pink-400 rounded-xl p-6 transition-all duration-300">
+                <div class="text-4xl text-pink-400 mb-4 group-hover:scale-110 transition-transform">
+                  <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-pink-400 mb-3">I/O Inteligente</h3>
+                
+                <p class="text-slate-300 text-sm mb-4">
+                  Integración de <strong>Inteligencia Artificial</strong> en dispositivos de entrada/salida para procesar datos localmente sin depender totalmente de la CPU.
+                </p>
+
+                <p class="text-slate-300 text-sm mb-4">
+                  El I/O inteligente permite que los dispositivos procesen datos usando IA, reduciendo la carga de la CPU. Por ejemplo, las SmartNICs optimizan el tráfico de red de forma autónoma.
+                </p>
+              </div>
+
+            </div>
+
+            <!-- Concepto: Ancho de Banda -->
+            <div class="mt-8 bg-gradient-to-r from-blue-900/40 via-purple-900/40 to-blue-900/40 p-6 rounded-xl border border-blue-500/30">
+  
+              <h3 class="text-xl font-semibold text-blue-400 mb-4">
+                <i class="fas fa-tachometer-alt mr-2"></i>¿Qué es el Ancho de Banda en I/O?
+              </h3>
+
+              <div class="flex gap-4 items-start">
+                
+                <div class="flex-1">
+
+                  <p class="text-slate-300 text-sm mb-4">
+                    El <strong>ancho de banda</strong> es la cantidad máxima de datos que pueden transferirse por segundo a través de un bus o canal de comunicación. Se mide en <strong>bits por segundo (bps)</strong> o múltiplos como <strong>GB/s</strong> (gigabytes por segundo).
+                  </p>
+
+                  <!-- Analogías -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+
+                    <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-600">
+                      <h4 class="text-green-400 font-semibold mb-2">🧊 Analogía del agua</h4>
+                      <p class="text-slate-400">
+                        Imagina una manguera: el <strong>ancho de banda</strong> es el diámetro de la manguera (cuánta agua pasa a la vez), y la <strong>latencia</strong> es el tiempo que tarda el agua en llegar desde el otro extremo.
+                      </p>
+                    </div>
+
+                    <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-600">
+                      <h4 class="text-yellow-400 font-semibold mb-2">🚗 Analogía del tráfico</h4>
+                      <p class="text-slate-400">
+                        El ancho de banda es como el número de carriles de una autopista. Más carriles = más autos pueden pasar simultáneamente. Sin embargo, si hay un atasco (latencia), los autos tardan más en llegar a destino.
+                      </p>
+                    </div>
+
+                  </div>
+
+                  <!-- Relación -->
+                  <div class="bg-slate-900/60 p-3 rounded-lg border border-blue-500/30 mt-4">
+                    <h4 class="text-blue-400 font-semibold mb-2">📊 Relación Ancho de Banda vs Latencia</h4>
+                    <ul class="text-slate-400 space-y-1 text-xs">
+                      <li>• <strong>Alto ancho de banda + baja latencia</strong> = Ideal (PCIe 7.0 para IA)</li>
+                      <li>• <strong>Alto ancho de banda + alta latencia</strong> = Aceptable para transferencias masivas (USB para discos)</li>
+                      <li>• <strong>Bajo ancho de banda + baja latencia</strong> = Bueno para comandos (teclado, red)</li>
+                      <li>• <strong>Bajo ancho de banda + alta latencia</strong> = Problema de rendimiento</li>
+                    </ul>
+                  </div>
+
+                  <!-- GB/s vs GT/s -->
+                  <div class="bg-slate-800/60 p-3 rounded-lg border border-cyan-500/30 mt-4">
+                    
+                    <h4 class="text-cyan-400 font-semibold mb-2">⚡ GB/s vs GT/s: ¿Cuál es la diferencia?</h4>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+
+                      <div class="bg-blue-900/30 p-2 rounded border border-blue-600/50">
+                        <h5 class="text-blue-400 font-semibold mb-1">GB/s (Gigabytes por segundo)</h5>
+                        <p class="text-slate-400">
+                          Mide la <strong>cantidad de datos útiles</strong> transferidos por segundo. Representa los datos reales que se mueven después de eliminar la sobrecarga (overhead) de codificación.
+                        </p>
+                        <ul class="text-slate-500 mt-1 space-y-1">
+                          <li>• 1 GB/s = 1,000,000,000 bytes/s</li>
+                          <li>• Es la velocidad <strong>real</strong> de transferencia</li>
+                          <li>• Lo que ves en la práctica</li>
+                        </ul>
+                      </div>
+
+                      <div class="bg-purple-900/30 p-2 rounded border border-purple-600/50">
+                        <h5 class="text-purple-400 font-semibold mb-1">GT/s (Gigatransferencias por segundo)</h5>
+                        <p class="text-slate-400">
+                          Mide las <strong>transacciones físicas</strong> por segundo en el bus. Es la velocidad "bruta" antes de aplicar codificación y overhead.
+                        </p>
+                        <ul class="text-slate-500 mt-1 space-y-1">
+                          <li>• 1 GT/s = 1,000,000,000 transferencias/s</li>
+                          <li>• Es la velocidad <strong>señal</strong> del bus</li>
+                          <li>• No es lo que experimentas directamente</li>
+                        </ul>
+                      </div>
+
+                    </div>
+
+                    <!-- Ejemplo -->
+                    <div class="flex gap-3 items-start mt-2">
+
+                      <div class="flex-1 bg-slate-900/60 p-2 rounded text-xs">
+                        <h5 class="text-yellow-400 font-semibold mb-1">📌 Ejemplo práctico PCIe 7.0</h5>
+                        <p class="text-slate-400">
+                          <span class="text-blue-400">256 GT/s</span> (velocidad de señal) frente a <span class="text-green-400">~242 GB/s</span> (datos útiles) usando codificación 128b/130b.
+                        </p>
+                        <p class="text-slate-500 mt-1">
+                          La diferencia (~5%) corresponde al overhead de codificación. Por eso PCIe 7.0 x16 anuncia "256 GT/s", pero logra aproximadamente <strong>512 GB/s bidireccionales</strong> al sumar ambos sentidos de transmisión.
+                        </p>
+                      </div>
+
+                      <div class="relative inline-block group cursor-pointer flex-shrink-0 self-start" title="Ver gráfico de ancho de banda" onclick="abrirImagen('img/ancho de banda I-O.jpg')">
+                        <i class="fas fa-eye text-slate-400 text-xl hover:text-cyan-400 transition"></i>
+                        <div class="absolute z-[999] hidden group-hover:block right-0 mt-2 w-[500px] p-2 bg-slate-900 rounded-lg border border-cyan-500 shadow-lg shadow-cyan-500/30 pointer-events-none">
+                          <img src="img/ancho de banda I-O.jpg" alt="Ancho de Banda" class="w-full max-h-64 object-contain rounded">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div> <!-- cierre flex-1 -->
+              </div> <!-- cierre flex -->
+            </div>
+
+              <!-- Comparación: PCIe vs CXL vs USB -->
+            <div class="mt-8 bg-slate-800/60 p-6 rounded-xl border border-slate-600">
+              <h3 class="text-xl font-semibold text-yellow-400 mb-4 flex items-center gap-2">
+                <i class="fas fa-balance-scale"></i> Comparación: PCIe vs CXL vs USB
+              </h3>
+              
+              <div class="overflow-x-auto mb-4">
+                <table class="w-full text-xs">
+                  <thead>
+                    <tr class="border-b border-slate-600">
+                      <th class="text-left py-2 px-2 text-slate-400">Tecnología</th>
+                      <th class="text-center py-2 px-2 text-slate-400">Ancho de banda máx.</th>
+                      <th class="text-center py-2 px-2 text-slate-400">Uso principal</th>
+                      <th class="text-center py-2 px-2 text-slate-400">Tipo</th>
+                      <th class="text-center py-2 px-2 text-slate-400">Alcance</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-slate-300">
+                    <tr class="border-b border-slate-700">
+                      <td class="py-2 px-2 font-bold text-blue-400">PCIe 7.0</td>
+                      <td class="text-center py-2 px-2">512 GB/s (x16)</td>
+                      <td class="text-center py-2 px-2">GPU, NVMe, RAID</td>
+                      <td class="text-center py-2 px-2"><span class="bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded">Interno</span></td>
+                      <td class="text-center py-2 px-2">Corto (slot)</td>
+                    </tr>
+                    <tr class="border-b border-slate-700">
+                      <td class="py-2 px-2 font-bold text-purple-400">CXL 4.0</td>
+                      <td class="text-center py-2 px-2">256 GB/s</td>
+                      <td class="text-center py-2 px-2">CPU-GPU, Memoria</td>
+                      <td class="text-center py-2 px-2"><span class="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded">Interno</span></td>
+                      <td class="text-center py-2 px-2">Medio (switch)</td>
+                    </tr>
+                    <tr class="border-b border-slate-700">
+                      <td class="py-2 px-2 font-bold text-green-400">USB4 v2</td>
+                      <td class="text-center py-2 px-2">80-120 Gbps</td>
+                      <td class="text-center py-2 px-2">Periféricos, video</td>
+                      <td class="text-center py-2 px-2"><span class="bg-green-500/20 text-green-300 px-2 py-0.5 rounded">Externo</span></td>
+                      <td class="text-center py-2 px-2">Largo (cable)</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                <div class="bg-blue-900/20 border border-blue-600/50 rounded-lg p-3">
+                  <h4 class="text-blue-400 font-semibold mb-2">PCIe</h4>
+                  <ul class="text-slate-400 space-y-1">
+                    <li>• <strong class="text-white">Propósito:</strong> Conexión interna de componentes</li>
+                    <li>• <strong class="text-white">Ventaja:</strong> Mayor ancho de banda</li>
+                    <li>• <strong class="text-white">Usa:</strong> GPUs, SSDs NVMe, tarjetas</li>
+                    <li>• <strong class="text-white">Hot-plug:</strong> Solo con energía</li>
+                  </ul>
+                </div>
+                <div class="bg-purple-900/20 border border-purple-600/50 rounded-lg p-3">
+                  <h4 class="text-purple-400 font-semibold mb-2">CXL</h4>
+                  <ul class="text-slate-400 space-y-1">
+                    <li>• <strong class="text-white">Propósito:</strong> Coherencia CPU-GPU-Memoria</li>
+                    <li>• <strong class="text-white">Ventaja:</strong> Memoria compartida</li>
+                    <li>• <strong class="text-white">Usa:</strong> Servidores, IA, HPC</li>
+                    <li>• <strong class="text-white">Latencia:</strong> ~100ns ultra baja</li>
+                  </ul>
+                </div>
+                <div class="bg-green-900/20 border border-green-600/50 rounded-lg p-3">
+                  <h4 class="text-green-400 font-semibold mb-2">USB</h4>
+                  <ul class="text-slate-400 space-y-1">
+                    <li>• <strong class="text-white">Propósito:</strong> Periféricos externos</li>
+                    <li>• <strong class="text-white">Ventaja:</strong> Hot-plug fácil</li>
+                    <li>• <strong class="text-white">Usa:</strong> Teclados, docks, cargas</li>
+                    <li>• <strong class="text-white">Distancia:</strong> Hasta 3-5m</li>
+                  </ul>
+                </div>
+              </div>
+
+              <p class="text-slate-400 text-xs mt-4">
+                <strong class="text-yellow-400">Resumen:</strong> PCIe es para dentro del equipo (máxima velocidad), CXL es para servidores con coherencia de memoria, y USB es para conectar dispositivos externos fácil.
+              </p>
+
+              <!-- Comparativa detallada PCIe vs CXL -->
+              <div class="mt-6 p-4 rounded-xl border border-slate-600">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+                  <!-- PCIe -->
+                  <div class="bg-blue-900/20 border border-blue-500/50 rounded-lg p-4">
+                    <h4 class="text-base font-bold text-blue-400 mb-2">🧬 PCIe (Peripheral Component Interconnect Express)</h4>
+                    <ul class="text-slate-300 space-y-2 mb-3">
+                      <li><strong>Uso:</strong> General</li>
+                      <li><strong>Función:</strong> Conectar dispositivos (GPU, SSD, red, etc.)</li>
+                      <li><strong>Dónde se usa:</strong> PCs, laptops, servidores</li>
+                      <li><strong>Tipo de comunicación:</strong> Transferencia de datos</li>
+                      <li><strong>Memoria compartida:</strong> ❌ No (cada dispositivo usa su propia memoria)</li>
+                      <li><strong>Estado:</strong> Estándar ampliamente adoptado</li>
+                    </ul>
+                    <p class="text-slate-400 italic border-t border-slate-700 pt-2">
+                      📌 Es como una autopista rápida donde los dispositivos envían paquetes, pero cada uno vive en su propia "casa".
+                    </p>
+                  </div>
+                  <!-- CXL -->
+                  <div class="bg-purple-900/20 border border-purple-500/50 rounded-lg p-4">
+                    <h4 class="text-base font-bold text-purple-400 mb-2">🧬 CXL (Compute Express Link)</h4>
+                    <ul class="text-slate-300 space-y-2 mb-3">
+                      <li><strong>Uso:</strong> Especializado</li>
+                      <li><strong>Función:</strong> Compartir memoria entre CPU, GPU y aceleradores</li>
+                      <li><strong>Dónde se usa:</strong> Principalmente servidores y centros de datos</li>
+                      <li><strong>Tipo de comunicación:</strong> Datos + memoria coherente</li>
+                      <li><strong>Memoria compartida:</strong> ✅ Sí (memoria unificada)</li>
+                      <li><strong>Estado:</strong> Tecnología emergente y avanzada</li>
+                    </ul>
+                    <p class="text-slate-400 italic border-t border-slate-700 pt-2">
+                      📌 Aquí ya no hay casas separadas: todos comparten la misma "memoria", como si fuera una mente colectiva.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tabla de Tiempos de Transferencia -->
+            <div class="mt-6 bg-slate-800/60 p-4 rounded-xl border border-slate-600">
+              <h4 class="text-base font-semibold text-yellow-400 mb-3 flex items-center gap-2">
+                <i class="fas fa-clock"></i> Tiempo para transferir 1 TB de datos
+              </h4>
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs">
+                  <thead>
+                    <tr class="border-b border-slate-600">
+                      <th class="text-left py-2 px-2 text-slate-400">Tecnología</th>
+                      <th class="text-center py-2 px-2 text-slate-400">Velocidad</th>
+                      <th class="text-center py-2 px-2 text-slate-400">1 TB (teórico)</th>
+                      <th class="text-center py-2 px-2 text-slate-400">1 TB (realista*)</th>
+                      <th class="text-left py-2 px-2 text-slate-400">Mejor uso</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-slate-300">
+                    <tr class="border-b border-slate-700">
+                      <td class="py-2 px-2 font-semibold text-blue-400">PCIe 5.0 x16</td>
+                      <td class="text-center py-2 px-2">64 GB/s</td>
+                      <td class="text-center py-2 px-2 text-green-400">~16 s</td>
+                      <td class="text-center py-2 px-2 text-yellow-400">~19 s</td>
+                      <td class="py-2 px-2 text-slate-400">GPU, NVMe Gen5</td>
+                    </tr>
+                    <tr class="border-b border-slate-700">
+                      <td class="py-2 px-2 font-semibold text-cyan-400">PCIe 6.0 x16</td>
+                      <td class="text-center py-2 px-2">128 GB/s</td>
+                      <td class="text-center py-2 px-2 text-green-400">~8 s</td>
+                      <td class="text-center py-2 px-2 text-yellow-400">~9 s</td>
+                      <td class="py-2 px-2 text-slate-400">IA, HPC</td>
+                    </tr>
+                    <tr class="border-b border-slate-700">
+                      <td class="py-2 px-2 font-semibold text-yellow-400">PCIe 7.0 x16</td>
+                      <td class="text-center py-2 px-2">256 GB/s</td>
+                      <td class="text-center py-2 px-2 text-green-400">~4 s</td>
+                      <td class="text-center py-2 px-2 text-yellow-400">~5 s</td>
+                      <td class="py-2 px-2 text-slate-400">IA avanzada</td>
+                    </tr>
+                    <tr class="border-b border-slate-700">
+                      <td class="py-2 px-2 font-semibold text-purple-400">CXL 3.1 x16</td>
+                      <td class="text-center py-2 px-2">128 GB/s</td>
+                      <td class="text-center py-2 px-2 text-green-400">~8 s</td>
+                      <td class="text-center py-2 px-2 text-yellow-400">~9 s</td>
+                      <td class="py-2 px-2 text-slate-400">Memoria compartida</td>
+                    </tr>
+                    <tr class="border-b border-slate-700">
+                      <td class="py-2 px-2 font-semibold text-green-400">USB4 v2</td>
+                      <td class="text-center py-2 px-2">80 Gbps</td>
+                      <td class="text-center py-2 px-2 text-orange-400">~100 s</td>
+                      <td class="text-center py-2 px-2 text-orange-400">~120 s</td>
+                      <td class="py-2 px-2 text-slate-400">Periféricos externos</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2 px-2 font-semibold text-slate-400">USB 3.2 Gen2x2</td>
+                      <td class="text-center py-2 px-2">20 Gbps</td>
+                      <td class="text-center py-2 px-2 text-red-400">~400 s</td>
+                      <td class="text-center py-2 px-2 text-red-400">~480 s</td>
+                      <td class="py-2 px-2 text-slate-400">Discos externos</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="text-[10px] text-slate-500 mt-2">
+                * Valores realistas incorporan ~20% overhead de protocolo y verificación de errores. Los valores de PCIe son bidireccionales (x16). USB tiene mayor overhead por serialización.
+              </p>
+            </div>
+
+            <!-- 2. Simulador Interactivo de Velocidad PCIe -->
+              <div class="mt-12 glass-panel p-8 rounded-3xl">
+                <h3 class="text-2xl font-bold text-center mb-2 flex items-center justify-center gap-3">
+                <i class="fas fa-tachometer-alt text-cyan-400"></i>
+                Simulador: Tiempo para transferir Datos a través de PCIe 5.0 vs 6.0 vs 7.0
+              </h3>
+              <p class="text-center text-sm text-slate-400 mb-8">Comparación real basada en especificaciones oficiales de PCI-SIG</p>
+
+              <!-- Controles -->
+              <div class="bg-slate-900/80 border border-slate-700 rounded-2xl p-6 mb-10">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <!-- PCIe 5.0 -->
+                  <div>
+                    <div class="flex justify-between mb-3">
+                      <span class="text-blue-400 font-bold">PCIe 5.0</span>
+                      <span id="value5" class="font-mono text-blue-400 font-bold">128 GB/s</span>
+                    </div>
+                    <input type="range" id="speed5" min="32" max="128" value="128" step="8"
+                          class="w-full accent-blue-500 cursor-pointer">
+                    <div class="text-xs text-slate-400 mt-1 text-center">
+                      <span id="range5">x1: 4 | x4: 16 | x8: 32 | x16: 128 GB/s</span>
+                    </div>
+                    <div class="text-xs text-blue-300 mt-1 text-center">
+                      64 GT/s • NRZ • 128b/130b
+                    </div>
+                  </div>
+
+              <!-- PCIe 6.0 -->
+              <div>
+                <div class="flex justify-between mb-3">
+                  <span class="text-cyan-400 font-bold">PCIe 6.0</span>
+                  <span id="value6" class="font-mono text-cyan-400 font-bold">128 GB/s</span>
+                </div>
+                <input type="range" id="speed6" min="32" max="128" value="128" step="8"
+                      class="w-full accent-cyan-500 cursor-pointer">
+                <div class="text-xs text-slate-400 mt-1 text-center">
+                  <span id="range6">x1: 8 | x4: 32 | x8: 64 | x16: 128 GB/s</span>
+                </div>
+                <div class="text-xs text-cyan-300 mt-1 text-center">
+                  128 GT/s • PAM4 • FEC + FLIT
+                </div>
+              </div>
+
+              <!-- PCIe 7.0 -->
+              <div>
+                <div class="flex justify-between mb-3">
+                  <span class="text-yellow-400 font-bold">PCIe 7.0</span>
+                  <span id="value7" class="font-mono text-yellow-400 font-bold">256 GB/s</span>
+                </div>
+                <input type="range" id="speed7" min="64" max="256" value="256" step="16"
+                      class="w-full accent-yellow-500 cursor-pointer">
+                <div class="text-xs text-slate-400 mt-1 text-center">
+                  <span id="range7">x1: 16 | x4: 64 | x8: 128 | x16: 256 GB/s</span>
+                </div>
+                <div class="text-xs text-yellow-300 mt-1 text-center">
+                  256 GT/s • PAM4 • FEC avanzado (Jun 2025)
+                </div>
+              </div>
+            </div>
+            <p class="text-xs text-slate-500 text-center mt-3">
+              * Valores bidireccionales máximos (x16). Full-duplex real.
+            </p>
+
+            <div class="mt-4">
+              <label for="directionMode" class="block text-slate-300 text-sm mb-2">Modo de transferencia</label>
+              <select id="directionMode" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-slate-200">
+                <option value="unidirectional">Unidireccional (Solo Lectura o Escritura)</option>
+                <option value="bidirectional" selected>Bidireccional Full-Duplex (Estándar 2026)</option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div>
+                <label for="dataAmount" class="block text-slate-300 text-sm mb-1">Datos a transferir (GB)</label>
+                <input type="number" id="dataAmount" min="1" max="10000" value="64" placeholder="datos a transferir" step="1" class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-slate-200" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+              <div>
+                <label for="lanes" class="block text-slate-300 text-sm mb-1">Lanes PCIe</label>
+                <select id="lanes" class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-slate-200">
+                  <option value="1">x1</option>
+                  <option value="4">x4</option>
+                  <option value="8">x8</option>
+                  <option value="16" selected>x16</option>
+                </select>
+              </div>
+              <div>
+                <label for="device" class="block text-slate-300 text-sm mb-1">Dispositivo</label>
+                <select id="device" class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-slate-200">
+                  <option value="none" selected>Ninguno (velocidad pura del bus)</option>
+                  <option value="ssd_gen4">SSD NVMe Gen4 (~7 GB/s)</option>
+                  <option value="ssd_gen5">SSD NVMe Gen5 (~14 GB/s)</option>
+                  <option value="gpu">GPU (~128 GB/s)</option>
+                </select>
+              </div>
+              <div>
+                <label for="mode" class="block text-slate-300 text-sm mb-1">Modo de cálculo</label>
+                <select id="mode" class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-slate-200">
+                  <option value="teorico">Teórico (sin overhead)</option>
+                  <option value="realista" selected>Realista (con overhead de protocolo)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Visualización de Frecuencias -->
+            <div class="mt-6 flex flex-col items-center gap-4">
+              <canvas id="picos-canvas" width="700" height="280" class="border border-slate-600 rounded bg-slate-900/50"></canvas>
+            </div>
+
+            <div class="flex justify-center gap-4 mt-8">
+              <button id="btn-iniciar-pcie" 
+                      class="bg-white hover:bg-slate-100 text-black font-semibold px-10 py-3.5 rounded-2xl flex items-center gap-3 transition-all active:scale-95">
+                <i class="fas fa-play"></i>
+                <span>Iniciar Transferencia</span>
+              </button>
+              
+              <button id="btn-detener-pcie" 
+                      class="bg-red-600 hover:bg-red-700 font-semibold px-8 py-3.5 rounded-2xl flex items-center gap-3 transition-all hidden">
+                <i class="fas fa-stop"></i>
+                <span>Detener</span>
+              </button>
+            </div>
+            </div>
+
+          <!-- Pistas de animación -->
+          <div class="space-y-12 mt-8">
+            <h3 class="text-2xl font-bold text-white mb-8 flex items-center justify-center gap-3">
+              <i class="fas fa-wave-square text-cyan-400"></i>
+              Visualización: Flujo de Datos en Tiempo Real
+            </h3>
+            <p class="text-center text-sm text-slate-400 mb-6">Observa cómo las partículas <span class="text-yellow-400 font-bold">PCIe 7.0</span> se mueven más rápido que <span class="text-blue-400 font-bold">PCIe 5.0</span> para transferir los mismos datos.</p>
+
+            <!-- PCIe 5.0 -->
+            <div>
+              <div class="flex justify-between items-center">
+                <span class="text-blue-400 font-bold">PCIe 5.0 (64 GT/s)</span>
+                <div class="text-right">
+                  <span id="tiempo5" class="font-mono text-blue-400 text-lg block">--</span>
+                  <span id="latencia5" class="font-mono text-blue-200 text-xs">Latencia: --</span>
+                </div>
+              </div>
+              <div class="track-container">
+                <div id="track5" class="track"></div>
+                <div id="particle5" class="particle"></div>
+              </div>
+            </div>
+
+            <!-- PCIe 6.0 -->
+            <div>
+              <div class="flex justify-between items-center">
+                <span class="text-cyan-400 font-bold">PCIe 6.0 (128 GT/s)</span>
+                <div class="text-right">
+                  <span id="tiempo6" class="font-mono text-cyan-400 text-lg block">--</span>
+                  <span id="latencia6" class="font-mono text-cyan-200 text-xs">Latencia: --</span>
+                </div>
+              </div>
+              <div class="track-container">
+                <div id="track6" class="track"></div>
+                <div id="particle6" class="particle"></div>
+              </div>
+            </div>
+
+            <!-- PCIe 7.0 -->
+            <div>
+              <div class="flex justify-between items-center">
+                <span class="text-yellow-400 font-bold">PCIe 7.0 (256 GT/s)</span>
+                <div class="text-right">
+                  <span id="tiempo7" class="font-mono text-yellow-400 text-lg block">--</span>
+                  <span id="latencia7" class="font-mono text-yellow-200 text-xs">Latencia: --</span>
+                </div>
+              </div>
+              <div class="track-container">
+                <div id="track7" class="track"></div>
+                <div id="particle7" class="particle"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <p class="text-center text-xs text-slate-400 mt-10" id="simulador-desc">
+            Observa que PCIe 7.0 (amarillo) es <strong class="text-yellow-400">4x más rápido</strong> que PCIe 5.0 (azul). La velocidad de las partículas es inversamente proporcional al tiempo total de transferencia.
+          </p>
+
+          <!-- Benchmarks y Datos Reales -->
+          <div class="mt-8 bg-slate-800/50 p-8 rounded-xl border border-slate-600">
+            <h3 class="text-xl font-bold text-brand-400 mb-4 flex items-center gap-2">
+              <i class="fas fa-chart-line"></i> Benchmarks Reales: Rendimiento de Transferencia
+            </h3>
+            <p class="text-slate-300 text-sm mb-4">
+              Los siguientes datos representan benchmarks y casos de uso reales documentados en 2024-2025:
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="bg-slate-900/60 p-6 rounded-lg border border-blue-500/30">
+                <h4 class="text-lg font-semibold text-blue-400 mb-3">PCIe 5.0 NVMe SSD</h4>
+                <p class="text-slate-400 text-sm mb-2"><strong>Dispositivo:</strong> Samsung 990 Pro Gen5</p>
+                <p class="text-slate-400 text-sm mb-2"><strong>Velocidad lectura:</strong> ~14 GB/s</p>
+                <p class="text-slate-400 text-sm mb-2"><strong>Velocidad escritura:</strong> ~12.5 GB/s</p>
+                <p class="text-slate-500 text-xs">IOPS: ~2.5M lectura aleatoria</p>
+              </div>
+              <div class="bg-slate-900/60 p-6 rounded-lg border border-cyan-500/30">
+                <h4 class="text-lg font-semibold text-cyan-400 mb-3">NVIDIA RTX 4090</h4>
+                <p class="text-slate-400 text-sm mb-2"><strong>Bus:</strong> PCIe 4.0 x16</p>
+                <p class="text-slate-400 text-sm mb-2"><strong>Ancho de banda:</strong> ~32 GB/s</p>
+                <p class="text-slate-400 text-sm mb-2"><strong>VRAM:</strong> 24 GB GDDR6X</p>
+                <p class="text-slate-500 text-xs">Con PCIe 5.0: hasta 128 GB/s</p>
+              </div>
+              <div class="bg-slate-900/60 p-6 rounded-lg border border-yellow-500/30">
+                <h4 class="text-lg font-semibold text-yellow-400 mb-3">Servidor IA (H100)</h4>
+                <p class="text-slate-400 text-sm mb-2"><strong>GPU:</strong> NVIDIA H100 (PCIe 5.0)</p>
+                <p class="text-slate-400 text-sm mb-2"><strong>NVLink:</strong> ~900 GB/s</p>
+                <p class="text-slate-400 text-sm mb-2"><strong>PCIe 5.0:</strong> ~128 GB/s</p>
+                <p class="text-slate-500 text-xs">CXL 4.0 para memoria compartida</p>
+              </div>
+            </div>
+            <div class="mt-6 p-4 bg-slate-900/40 rounded-lg border border-slate-600">
+              <p class="text-slate-300 text-sm">
+                <strong class="text-green-400">Caso real 2025:</strong> Un servidor con CPU AMD EPYC 9004 + 8x NVIDIA H100 conectado mediante PCIe 5.0 puede transferir hasta 1 TB/s entre CPU y GPUs, esencial para entrenamiento de modelos de IA con billions de parámetros.
+              </p>
+            </div>
+          </div>
+          </div>
+
+            <div class="mt-16 text-center">
+              <div class="glass-panel p-8 rounded-3xl border border-slate-700">
+                <h3 class="text-2xl font-bold text-white mb-6 flex items-center justify-center gap-3">
+                  <i class="fas fa-chart-line text-cyan-400"></i>
+                  Métricas de Rendimiento PCIe 2026
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                  <!-- Eficiencia -->
+                  <div class="bg-slate-800/60 p-6 rounded-xl border border-slate-600">
+                    <h4 class="text-xl font-bold text-green-400 mb-4 flex items-center gap-2">
+                      <i class="fas fa-bullseye"></i> Eficiencia
+                    </h4>
+                    <div class="space-y-3">
+                      <div class="flex justify-between items-center">
+                        <span class="text-blue-400 font-semibold">PCIe 5.0</span>
+                        <span class="font-mono text-blue-300">85%</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <span class="text-cyan-400 font-semibold">PCIe 6.0</span>
+                        <span class="font-mono text-cyan-300">90%</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <span class="text-yellow-400 font-semibold">PCIe 7.0</span>
+                        <span class="font-mono text-yellow-300">88%</span>
+                      </div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-4 text-center">
+                      Porcentaje de ancho de banda útil vs. teórico
+                    </p>
+                  </div>
+
+                  <!-- Latencia -->
+                  <div class="bg-slate-800/60 p-6 rounded-xl border border-slate-600">
+                    <h4 class="text-xl font-bold text-red-400 mb-4 flex items-center gap-2">
+                      <i class="fas fa-stopwatch"></i> Latencia
+                    </h4>
+                    <div class="space-y-3">
+                      <div class="flex justify-between items-center">
+                        <span class="text-blue-400 font-semibold">PCIe 5.0</span>
+                        <span class="font-mono text-blue-300">200 μs</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <span class="text-cyan-400 font-semibold">PCIe 6.0</span>
+                        <span class="font-mono text-cyan-300">150 μs</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <span class="text-yellow-400 font-semibold">PCIe 7.0</span>
+                        <span class="font-mono text-yellow-300">100 μs</span>
+                      </div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-4 text-center">
+                      μs = microsegundo
+                    </p>
+                  </div>
+                </div>
+
+                <!-- La Triada -->
+                <div class="bg-gradient-to-r from-blue-900/40 via-purple-900/40 to-blue-900/40 p-6 rounded-xl border border-purple-500/30">
+                  <h4 class="text-xl font-bold text-purple-400 mb-4 flex items-center justify-center gap-2">
+                    <i class="fas fa-balance-scale"></i> Relación Completa (La Triada)
+                  </h4>
+                  <p class="text-slate-300 mb-4 text-center">
+                    Todo se conecta así:
+                  </p>
+                  <div class="flex flex-wrap justify-center gap-6 text-lg">
+                    <div class="bg-slate-800/80 px-6 py-3 rounded-lg border border-blue-500/50">
+                      <span class="text-slate-400 text-sm block">Velocidad</span>
+                      <span class="text-blue-400 font-mono font-bold">= Datos / Tiempo</span>
+                    </div>
+                    <div class="bg-slate-800/80 px-6 py-3 rounded-lg border border-cyan-500/50">
+                      <span class="text-slate-400 text-sm block">Tiempo</span>
+                      <span class="text-cyan-400 font-mono font-bold">= Datos / Velocidad</span>
+                    </div>
+                    <div class="bg-slate-800/80 px-6 py-3 rounded-lg border border-yellow-500/50">
+                      <span class="text-slate-400 text-sm block">Datos</span>
+                      <span class="text-yellow-400 font-mono font-bold">= Velocidad × Tiempo</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          <!-- Tarjeta Madre: Conexión con los puertos y PCIe -->
+          <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-600 mt-8">
+            <h3 class="text-xl font-bold text-brand-400 mb-4 flex items-center gap-2">
+              <i class="fas fa-memory"></i> La Tarjeta Madre y su Relación con PCIe
+            </h3>
+            <p class="text-slate-300 text-sm mb-4">
+              La <strong>tarjeta madre (motherboard)</strong> es el circuito impreso principal que conecta todos los componentes de la computadora. 
+              En ella se encuentran los <strong>slots PCIe</strong> donde se instalan tarjetas de expansión como GPUs, SSDs NVMe y tarjetas de red.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-slate-900/60 p-4 rounded-lg border border-blue-500/30">
+                <h4 class="text-lg font-semibold text-blue-400 mb-3">
+                  <i class="fas fa-microchip mr-2"></i>Slots PCIe en la Motherboard
+                </h4>
+                <ul class="text-slate-300 text-sm space-y-2">
+                  <li><strong class="text-blue-300">• Slot x16:</strong> Para GPUs de alto rendimiento. Proveen el máximo ancho de banda (hasta 512 GB/s en PCIe 7.0 x16).</li>
+                  <li><strong class="text-blue-300">• Slot x4:</strong> Comúnmente usado para SSDs NVMe Gen4/Gen5. También para tarjetas de expansión.</li>
+                  <li><strong class="text-blue-300">• Slot x1:</strong> Para tarjetas de sonido, red Gigabit, controladoras USB adicionales.</li>
+                </ul>
+              </div>
+              <div class="bg-slate-900/60 p-4 rounded-lg border border-green-500/30">
+                <h4 class="text-lg font-semibold text-green-400 mb-3">
+                  <i class="fas fa-plug mr-2"></i>Puertos Integrados
+                </h4>
+                <ul class="text-slate-300 text-sm space-y-2">
+                  <li><strong class="text-green-300">• USB:</strong> Puertos USB-A y USB-C integrados en el chipset (PCH). USB4 v2 hasta 80 Gbps.</li>
+                  <li><strong class="text-green-300">• SATA:</strong> Para discos duros y SSDs SATA. Legacy pero aún presente (6 Gbps).</li>
+                  <li><strong class="text-green-300">• Ethernet:</strong> Controladora de red integrada (2.5 GbE estándar en 2026).</li>
+                  <li><strong class="text-green-300">• HDMI/DisplayPort:</strong> Video integrado (desde la GPU integrada o CPU).</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-4 p-3 bg-slate-900/40 rounded-lg border border-slate-600">
+              <p class="text-slate-300 text-sm text-center">
+                <strong class="text-yellow-400">En resumen:</strong> La tarjeta madre es el <span class="text-blue-400">"hub"</span> central que conecta CPU, RAM, almacenamiento y periféricos. 
+                Los <span class="text-green-400">slots PCIe</span> son las autopistas de alta velocidad que permiten comunicación directa entre la CPU y dispositivos de alto rendimiento como GPUs y SSDs.
+              </p>
+            </div>
+          </div>
+        </div>
+          <div class="mt-8 flex justify-between">
+            <button class="text-slate-400 hover:text-white transition" onclick="navegarA('buses')"><i class="fas fa-arrow-left mr-2"></i> Anterior</button>
+            <button class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded font-semibold transition" onclick="navegarA('quiz')">Siguiente: Quiz <i class="fas fa-arrow-right ml-2"></i></button>
+          </div>
+      </div>
+
+          <!-- ================= SECCIÓN: QUIZ ================= -->
+      <div id="quiz" class="level-content" role="tabpanel" aria-labelledby="tab-quiz">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3"><i class="fas fa-gamepad text-brand-400"></i> Evaluación Rápida</h2>
+            
+            <div class="bg-slate-800 border border-slate-600 rounded-xl p-8 max-w-3xl mx-auto min-h-[300px] flex flex-col justify-center relative">
+               
+              <!-- Indicador de preguntas -->
+              <div class="absolute top-4 right-6 text-sm text-slate-400 font-bold" id="quiz-counter">Pregunta 1/27</div>
+
+              <!-- Pantalla inicial -->
+              <div id="quiz-start" class="text-center flex flex-col items-center">
+                <i class="fas fa-gamepad text-6xl text-brand-400 mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">¡Pon a prueba tus conocimientos!</h3>
+                <p class="text-slate-400 mb-6">20 preguntas sobre Sistemas de Entrada/Salida, DMA, IRQ, PCIe, USB y más.</p>
+                <button class="bg-brand-500 text-black px-8 py-3 rounded-lg font-bold text-lg hover:bg-brand-400 transition" onclick="iniciarQuiz()" aria-label="Iniciar el quiz">Empezar Quiz</button>
+              </div>
+
+              <div id="quiz-content" class="hidden">
+                <h3 class="text-xl font-semibold mb-6" id="pregunta">Cargando...</h3>
+                <div class="flex flex-col gap-3" id="opciones">
+                  <!-- Opciones inyectadas por JS -->
+                </div>
+              </div>
+              
+              <div id="quiz-result" class="text-center hidden flex-col items-center">
+                <i class="fas fa-trophy text-6xl text-brand-400 mb-4 mt-4"></i>
+                <h3 class="text-3xl font-bold mb-2">¡Quiz Completado!</h3>
+                <p class="text-xl text-slate-300 mb-6" id="puntuacion-final"></p>
+                <button class="bg-brand-500 text-black px-6 py-3 rounded-lg font-bold" onclick="reiniciarQuiz()" aria-label="Reiniciar el quiz">Reintentar</button>
+              </div>
+            </div>
+      
+
+            <div class="mt-8 flex justify-between">
+              <button class="text-slate-400 hover:text-white transition" onclick="navegarA('avances')"><i class="fas fa-arrow-left mr-2"></i> Anterior</button>
+              <button class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded font-semibold transition" onclick="navegarA('ia')">Siguiente: IA Asistentes <i class="fas fa-arrow-right ml-2"></i></button>
+            </div>
+      </div>
+
+          <!-- ================= SECCIÓN: IA ASISTENTES ================= -->
+      <div id="ia" class="level-content" role="tabpanel" aria-labelledby="tab-ia">
+            <div class="p-4 rounded-xl">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+              <i class="fas fa-robot text-orange-400"></i>
+              Inteligencias Artificiales Usadas en el Proyecto
+            </h2>
+            <p class="text-lg text-slate-300 mb-8">
+              Este proyecto fue desarrollado con la asistencia de múltiples herramientas de inteligencia artificial, cada una con un rol específico en el proceso de creación.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              
+              <!-- Grok -->
+              <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-6 hover:border-orange-400 transition-all duration-300">
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                    <span class="text-2xl">🚀</span>
+                  </div>
+                  <div>
+                    <h3 class="text-xl font-bold text-orange-400">Grok</h3>
+                    <p class="text-xs text-slate-500">por xAI (Elon Musk)</p>
+                  </div>
+                </div>
+                <div class="space-y-3">
+                  <div class="bg-slate-900/50 rounded-lg p-3">
+                    <p class="text-sm text-slate-300 font-semibold mb-1">Rol: Información</p>
+                    <p class="text-xs text-slate-400">Investigación y recopilación de datos técnicos sobre PCIe 6.0, USB4 v2, CXL 4.0 y otras tecnologías de I/O de 2026.</p>
+                  </div>
+                  <div class="bg-slate-900/50 rounded-lg p-3">
+                    <p class="text-sm text-slate-300 font-semibold mb-1">Contribución</p>
+                    <ul class="text-xs text-slate-400 space-y-1">
+                      <li>• Especificaciones técnicas de buses</li>
+                      <li>• Comparativas de rendimiento</li>
+                      <li>• Datos actualizados de estándares 2026</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ChatGPT -->
+              <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-6 hover:border-green-400 transition-all duration-300">
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                    <span class="text-2xl">💬</span>
+                  </div>
+                  <div>
+                    <h3 class="text-xl font-bold text-green-400">ChatGPT</h3>
+                    <p class="text-xs text-slate-500">por OpenAI</p>
+                  </div>
+                </div>
+                <div class="space-y-3">
+                  <div class="bg-slate-900/50 rounded-lg p-3">
+                    <p class="text-sm text-slate-300 font-semibold mb-1">Rol: Animaciones</p>
+                    <p class="text-xs text-slate-400">Generación de código para las animaciones interactivas del simulador DMA, partículas PCIe y visualizaciones canvas.</p>
+                  </div>
+                  <div class="bg-slate-900/50 rounded-lg p-3">
+                    <p class="text-sm text-slate-300 font-semibold mb-1">Contribución</p>
+                    <ul class="text-xs text-slate-400 space-y-1">
+                      <li>• Animaciones de partículas en canvas</li>
+                      <li>• Simulador DMA interactivo</li>
+                      <li>• Efectos visuales y transiciones</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Kilo Code -->
+              <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-6 hover:border-purple-400 transition-all duration-300">
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                    <span class="text-2xl">✨</span>
+                  </div>
+                  <div>
+                    <h3 class="text-xl font-bold text-purple-400">Kilo Code</h3>
+                    <p class="text-xs text-slate-500">Agente de Código IA</p>
+                  </div>
+                </div>
+                <div class="space-y-3">
+                  <div class="bg-slate-900/50 rounded-lg p-3">
+                    <p class="text-sm text-slate-300 font-semibold mb-1">Rol: Corrección de Detalles</p>
+                    <p class="text-xs text-slate-400">Depuración, corrección de bugs y refinamiento del código existente para garantizar funcionamiento correcto.</p>
+                  </div>
+                  <div class="bg-slate-900/50 rounded-lg p-3">
+                    <p class="text-sm text-slate-300 font-semibold mb-1">Contribución</p>
+                    <ul class="text-xs text-slate-400 space-y-1">
+                      <li>• Corrección de bugs del simulador PCIe</li>
+                      <li>• Interpolación de animaciones</li>
+                      <li>• Limpieza y optimización de código</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Flujo de trabajo -->
+            <div class="mt-12 bg-slate-900/60 border border-slate-700 rounded-xl p-8">
+              <h3 class="text-2xl font-bold text-center mb-8 text-white">
+                <i class="fas fa-diagram-project text-brand-400 mr-2"></i>
+                Flujo de Trabajo con IA
+              </h3>
+              <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
+                <div class="flex flex-col items-center text-center">
+                  <div class="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mb-3 border-2 border-orange-400">
+                    <span class="text-3xl">🚀</span>
+                  </div>
+                  <p class="text-sm font-bold text-orange-400">1. Grok</p>
+                  <p class="text-xs text-slate-400 mt-1">Investigación</p>
+                </div>
+                <div class="text-slate-600 text-2xl hidden md:block">
+                  <i class="fas fa-arrow-right"></i>
+                </div>
+                <div class="text-slate-600 text-2xl md:hidden">
+                  <i class="fas fa-arrow-down"></i>
+                </div>
+                <div class="flex flex-col items-center text-center">
+                  <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-3 border-2 border-green-400">
+                    <span class="text-3xl">💬</span>
+                  </div>
+                  <p class="text-sm font-bold text-green-400">2. ChatGPT</p>
+                  <p class="text-xs text-slate-400 mt-1">Animaciones</p>
+                </div>
+                <div class="text-slate-600 text-2xl hidden md:block">
+                  <i class="fas fa-arrow-right"></i>
+                </div>
+                <div class="text-slate-600 text-2xl md:hidden">
+                  <i class="fas fa-arrow-down"></i>
+                </div>
+                <div class="flex flex-col items-center text-center">
+                  <div class="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mb-3 border-2 border-purple-400">
+                    <span class="text-3xl">✨</span>
+                  </div>
+                  <p class="text-sm font-bold text-purple-400">3. Kilo Code</p>
+                  <p class="text-xs text-slate-400 mt-1">Corrección</p>
+                </div>
+              </div>
+              <p class="text-center text-slate-400 text-sm mt-8 italic">
+                "La colaboración entre múltiples IAs permite combinar fortalezas: investigación, creatividad visual y precisión técnica."
+              </p>
+            </div>
+
+            <div class="mt-8 flex justify-between">
+              <button class="text-slate-400 hover:text-white transition" onclick="navegarA('quiz')"><i class="fas fa-arrow-left mr-2"></i> Anterior</button>
+            </div>
+
+            <!-- Referencias Bibliográficas en IA Asistentes -->
+            <div class="glass-panel rounded-2xl p-6 mt-12">
+              <h4 class="text-lg font-semibold text-slate-300 mb-4">Referencias Bibliográficas</h4>
+              <ul class="text-xs text-slate-400 space-y-3 leading-relaxed">
+                <li>Patterson, D. A., & Hennessy, J. L. (2020). <i>Computer Organization and Design: The Hardware/Software Interface</i> (RISC-V Edition, 2ª ed.). Morgan Kaufmann.</li>
+                <li>Stallings, W. (2019). <i>Computer Organization and Architecture: Designing for Performance</i> (11ª ed.). Pearson.</li>
+                <li>Silberschatz, A., Galvin, P. B., & Gagne, G. (2018). <i>Operating System Concepts</i> (10ª ed.). Wiley.</li>
+                <li>Tanenbaum, A. S., & Austin, T. (2013). <i>Structured Computer Organization</i> (6ª ed.). Pearson.</li>
+                
+                <!-- Fuentes 2023-2026 -->
+                <li class="pt-4 border-t border-slate-700 text-brand-400 font-semibold">Fuentes y Referencias del Período 2023-2026</li>
+                <li>PCI-SIG. (2025). <i>PCI Express Base Specification Revision 7.0</i>. PCI Special Interest Group. https://pcisig.com/specifications/pci-express-base-specification</li>
+                <li>PCI-SIG. (2022). <i>PCI Express Base Specification Revision 6.0</i>. PCI Special Interest Group. https://pcisig.com</li>
+                <li>Compute Express Link (CXL) Consortium. (2025). <i>CXL 4.0 Specification</i>. https://computeexpresslink.org</li>
+                <li>USB Implementers Forum. (2024). <i>USB4 Version 2.0 Specification</i>. https://usb.org/usb4</li>
+                <li>Intel Corporation. (2024). <i>Thunderbolt 5: The Next Generation of Connectivity</i>. Technology Brief. https://intel.com</li>
+                <li>IEEE Standards Association. (2024). <i>IEEE 802.11be-2024: WiFi 7 Standard</i>. https://standards.ieee.org</li>
+                <li>NVIDIA. (2024). <i>PCIe 7.0 for AI Infrastructure</i>. Technical Blog Series. https://nvidia.com/blog</li>
+                <li>AMD. (2024). <i>Zen 5 Architecture and I/O Technologies</i>. Technical Documentation. https://amd.com</li>
+                <li>SK Hynix. (2024). <i>Memory Trends and CXL 4.0 for AI Workloads</i>. White Paper. https://skhynix.com</li>
+                <li>AnandTech. (2025). <i>PCIe 7.0 Specification Finalized: What to Expect</i>. https://anandtech.com</li>
+                <li>TechPowerUp. (2024). <i>USB4 v2 80 Gbps Review</i>. https://techpowerup.com</li>
+                <li>WikiChip Fuse. (2024). <i>CXL 4.0: Coherent Memory Expansion</i>. Technical Analysis. https://wikichip.org</li>
+                <li>Hot Chips. (2024). <i>Next-Generation I/O for AI Servers</i>. Conference Proceedings. https://hotchips.org</li>
+              </ul>
+            </div>
+            </div>
+
+      </div>
+    </div>
+
+  <script src="script.js"></script>
+
+  </div>
+    <!-- Línea inferior -->
+    <div class="max-w-full mx-auto px-5">
+      <div class="glass-panel rounded-2xl border-t border-slate-800 mt-6 p-8 text-center w-[95%] mx-auto">
+        <p class="text-slate-500 text-sm">
+          © 2026 Grupo 4 • Arquitectura de Computadores<br>
+          Universidad Antonio José de Sucre • Sincelejo - Sucre, Colombia • Greylis Agudelo, Natalia Gongora & Valeria Ospino
+        </p>
+        <p class="text-xs text-slate-600 mt-4">
+          Todas las simulaciones y diagramas fueron creados con fines educativos.
+        </p>
+      </div>
+    </div>
+</div>
+
+<!-- Modal para imagen grande -->
+<div id="modal-imagen" class="fixed inset-0 z-[9999] hidden bg-black/90 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Imagen ampliada" onclick="cerrarImagen()">
+  <img id="modal-img-src" src="" alt="Imagen" class="max-w-3xl max-h-[80vh] rounded-lg shadow-2xl">
+</div>
+</body>
+</html>
