@@ -1,4 +1,4 @@
-﻿// =============================================
+// =============================================
 // IO Systems 2026 - Arquitectura Modular
 // =============================================
 // Paradigmas: Programación funcional, Defensive Programming,
@@ -1809,7 +1809,7 @@ const QUESTIONS = Object.freeze([
       { q: '¿Cuál es el bus más cercano a la CPU en una PC moderna?', opts: ['PCIe', 'USB', 'Bus de memoria (CPU-RAM)', 'SATA'], ans: 2, explain: 'El bus de memoria conecta directamente la CPU con la RAM y es el más rápido del sistema.' },
       { q: '¿Qué es un Root Port en PCIe?', opts: ['Un puerto USB', 'El punto de conexión principal del Root Complex al bus PCIe', 'Un tipo de SSD', 'Un concentrador de red'], ans: 1, explain: 'El Root Port es el punto de conexión principal desde la CPU/Chipset al bus PCIe.' },
       { q: '¿Para qué sirve un Switch PCIe?', opts: ['Para apagar el sistema', 'Para conectar múltiples dispositivos PCIe y dirigir el tráfico', 'Para aumentar la memoria', 'Para conectar monitores'], ans: 1, explain: 'Un Switch PCIe conecta múltiples dispositivos y permite compartir enlaces.' },
-      { q: '¿Qué velocidad alcanza PCIe 7.0 (x16)?', opts: ['64 GT/s', '128 GT/s', '256 GT/s', '512 GT/s'], ans: 2, explain: 'PCIe 7.0 alcanza 256 GT/s en configuración x16.' },
+      { q: '¿Qué velocidad total (bidireccional) alcanza PCIe 7.0 (x16)?', opts: ['64 GT/s', '128 GT/s', '256 GT/s', '512 GT/s'], ans: 2, explain: 'PCIe 7.0 alcanza 256 GT/s bidireccionales en configuración x16 (aproximadamente 512 GB/s sumando ambas direcciones).' },
       { q: '¿Qué modulación usa PCIe 6.0 para duplicar velocidad?', opts: ['NRZ', 'PAM4', 'QAM', 'FSK'], ans: 1, explain: 'PCIe 6.0 usa PAM4 (2 bits por símbolo) para duplicar el ancho de banda.' },
       { q: '¿Cuántos GT/s alcanza CXL 4.0?', opts: ['32 GT/s', '64 GT/s', '128 GT/s', '256 GT/s'], ans: 2, explain: 'CXL 4.0 alcanza hasta 128 GT/s.' },
       { q: '¿Quién desarrolló originalmente CXL?', opts: ['AMD', 'NVIDIA', 'Intel', 'Google'], ans: 2, explain: 'Intel desarrolló originalmente CXL y lo donó al Consortium en 2019.' },
@@ -1824,42 +1824,50 @@ const QUESTIONS = Object.freeze([
     let current = 0;
     let score = 0;
 
-    const load = () => {
-      if (current >= SHUFFLED_QUESTIONS.length) return;
-      const q = SHUFFLED_QUESTIONS[current];
-      setText(DOM.quizCounter, `Pregunta ${current + 1}/${SHUFFLED_QUESTIONS.length}`);
-      setText(DOM.quizPregunta, q.q);
+     const load = () => {
+       if (current >= SHUFFLED_QUESTIONS.length) return;
+       const q = SHUFFLED_QUESTIONS[current];
+       setText(DOM.quizCounter, `Pregunta ${current + 1}/${SHUFFLED_QUESTIONS.length}`);
+       setText(DOM.quizPregunta, q.q);
 
-      const optsEl = $(DOM.quizOpciones);
-      if (!optsEl) return;
+       const optsEl = $(DOM.quizOpciones);
+       if (!optsEl) return;
 
-      let sibling = optsEl.nextElementSibling;
-      while (sibling) {
-        const next = sibling.nextElementSibling;
-        if (sibling.classList.contains('mt-4') || sibling.id === 'quiz-next-btn') {
-          sibling.remove();
-        }
-        sibling = next;
-      }
+       let sibling = optsEl.nextElementSibling;
+       while (sibling) {
+         const next = sibling.nextElementSibling;
+         if (sibling.classList.contains('mt-4') || sibling.id === 'quiz-next-btn') {
+           sibling.remove();
+         }
+         sibling = next;
+       }
 
-      if (q.type === 'drag') {
-        loadDragQuestion(q);
-      } else {
-        optsEl.innerHTML = q.opts
-          .map((opt, i) => {
-            const letters = ['A', 'B', 'C', 'D'];
-            return `<button data-idx="${i}" class="quiz-opt w-full text-left p-3 rounded-lg bg-slate-700 hover:bg-slate-600 border border-slate-500 transition-colors font-medium flex items-center gap-3">
-              <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded bg-slate-600 font-bold">${letters[i]}</span>
-              <span>${opt}</span>
-            </button>`;
-          })
-          .join('');
+       if (q.type === 'drag') {
+         loadDragQuestion(q);
+       } else {
+         // Aleatorizar opciones manteniendo el índice de la respuesta correcta
+         const optsConIndices = q.opts.map((opt, idx) => ({ opt, originalIdx: idx }));
+         const shuffledOpts = optsConIndices.sort(() => Math.random() - 0.5);
+         const newCorrectIndex = shuffledOpts.findIndex(item => item.originalIdx === q.ans);
+         
+         // Actualizar temporalmente la respuesta correcta para esta pregunta
+         SHUFFLED_QUESTIONS[current].ans = newCorrectIndex;
 
-        optsEl.querySelectorAll('.quiz-opt').forEach((btn) => {
-          btn.addEventListener('click', () => answer(parseInt(btn.dataset.idx), btn));
-        });
-      }
-    };
+         optsEl.innerHTML = shuffledOpts
+           .map((item, i) => {
+             const letters = ['A', 'B', 'C', 'D'];
+             return `<button data-idx="${i}" class="quiz-opt w-full text-left p-3 rounded-lg bg-slate-700 hover:bg-slate-600 border border-slate-500 transition-colors font-medium flex items-center gap-3">
+               <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded bg-slate-600 font-bold">${letters[i]}</span>
+               <span>${item.opt}</span>
+             </button>`;
+           })
+           .join('');
+
+         optsEl.querySelectorAll('.quiz-opt').forEach((btn) => {
+           btn.addEventListener('click', () => answer(parseInt(btn.dataset.idx), btn));
+         });
+       }
+     };
 
     const loadDragQuestion = (q) => {
       const optsEl = $(DOM.quizOpciones);
@@ -1955,21 +1963,22 @@ const QUESTIONS = Object.freeze([
       $(DOM.quizOpciones)?.after(nextBtn);
     };
 
-    const answer = (idx, btn) => {
-      const btns = $(DOM.quizOpciones)?.querySelectorAll('button');
-      if (!btns) return;
-      btns.forEach((b) => { b.disabled = true; b.classList.add('cursor-not-allowed', 'opacity-70'); });
+     const answer = (idx, btn) => {
+       const btns = $(DOM.quizOpciones)?.querySelectorAll('button');
+       if (!btns) return;
+       btns.forEach((b) => { b.disabled = true; b.classList.add('cursor-not-allowed', 'opacity-70'); });
 
-const correct = SHUFFLED_QUESTIONS[current].ans;
-      const isCorrect = idx === correct;
-      if (isCorrect) {
-        btn.classList.replace('bg-slate-700', 'bg-green-600');
-        btn.classList.replace('border-slate-500', 'border-green-400');
-      } else {
-        btn.classList.replace('bg-slate-700', 'bg-red-600');
-        btn.classList.replace('border-slate-500', 'border-red-400');
-        btns[correct].classList.replace('bg-slate-700', 'bg-green-600');
-      }
+       const correct = SHUFFLED_QUESTIONS[current].ans;
+       const isCorrect = idx === correct;
+       if (isCorrect) {
+         btn.classList.replace('bg-slate-700', 'bg-green-600');
+         btn.classList.replace('border-slate-500', 'border-green-400');
+         score++;
+       } else {
+         btn.classList.replace('bg-slate-700', 'bg-red-600');
+         btn.classList.replace('border-slate-500', 'border-red-400');
+         btns[correct].classList.replace('bg-slate-700', 'bg-green-600');
+       }
 
       const explain = SHUFFLED_QUESTIONS[current].explain;
       if (explain) {
