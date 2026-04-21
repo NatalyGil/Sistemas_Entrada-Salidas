@@ -731,7 +731,7 @@
                     <p class="text-slate-300 mb-2"><strong class="text-cyan-300">Interrupción Final:</strong> Al terminar, el DMA envía una IRQ para notificar a la CPU.</p>
                   </div>
                 </div>
-              </div>
+                </div>
 
               <div class="mt-10 bg-emerald-900/30 border border-emerald-700 p-6 rounded-xl mb-8">
                 <h3 class="text-emerald-400 font-semibold mb-3">Beneficios cuantitativos</h3>
@@ -838,51 +838,6 @@
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-
-              <!-- Diferencia con I/O Programado -->
-              <div class="bg-slate-800/60 border border-slate-600 rounded-xl p-4 mb-8">
-                <h3 class="text-base font-semibold text-orange-300 mb-3 flex items-center gap-2">
-                  <i class="fas fa-balance-scale mr-2"></i>DMA vs I/O Programado
-                </h3>
-                <div class="overflow-x-auto">
-                  <table class="w-full text-xs">
-                    <thead>
-                      <tr class="border-b border-slate-600">
-                        <th class="text-left py-2 px-2 text-slate-400">Aspecto</th>
-                        <th class="text-center py-2 px-2 text-red-400">I/O Programado</th>
-                        <th class="text-center py-2 px-2 text-green-400">DMA</th>
-                      </tr>
-                    </thead>
-                    <tbody class="text-slate-300">
-                      <tr class="border-b border-slate-700">
-                        <td class="py-2 px-2 font-semibold">Participación CPU</td>
-                        <td class="text-center py-2 px-2"><span class="bg-red-500/20 text-red-300 px-2 py-0.5 rounded">100%</span></td>
-                        <td class="text-center py-2 px-2"><span class="bg-green-500/20 text-green-300 px-2 py-0.5 rounded">&lt; 1%</span></td>
-                      </tr>
-                      <tr class="border-b border-slate-700">
-                        <td class="py-2 px-2 font-semibold">Ciclos por byte</td>
-                        <td class="text-center py-2 px-2">~15 ciclos</td>
-                        <td class="text-center py-2 px-2">~0.05 ciclos</td>
-                      </tr>
-                      <tr class="border-b border-slate-700">
-                        <td class="py-2 px-2 font-semibold">Transferencia 1MB</td>
-                        <td class="text-center py-2 px-2">~15M ciclos CPU</td>
-                        <td class="text-center py-2 px-2">~200 ciclos setup</td>
-                      </tr>
-                      <tr class="border-b border-slate-700">
-                        <td class="py-2 px-2 font-semibold">Bloqueo CPU</td>
-                        <td class="text-center py-2 px-2"><span class="text-red-400">Sí</span></td>
-                        <td class="text-center py-2 px-2"><span class="text-green-400">No</span></td>
-                      </tr>
-                      <tr>
-                        <td class="py-2 px-2 font-semibold">Uso típico</td>
-                        <td class="text-center py-2 px-2">Dispositivos lentos</td>
-                        <td class="text-center py-2 px-2">SSD, Red, Audio, GPU</td>
-                      </tr>
-                    </tbody>
-                  </table>
                 </div>
               </div>
 
@@ -1272,31 +1227,39 @@
                 <h3 class="text-lg font-semibold text-green-400 mb-2">
                   <i class="fas fa-plug mr-2"></i>¿Qué es USB?
                 </h3>
-                <div class="flex gap-4 items-start">
-                  <div class="flex-1">
-                    <p class="text-slate-300 text-sm mb-2">
-                      <strong>USB (Universal Serial Bus)</strong> es el estándar de conectividad más utilizado para conectar periféricos externos a una computadora. 
-                      Fue creado para simplificar la conexión de dispositivos como teclados, mouse, impresoras, discos externos y cargadores.
-                    </p>
-                    <p class="text-slate-300 text-xs mb-2">
-                      <strong>Thunderbolt:</strong> Desarrollado inicialmente por <span class="text-yellow-400 font-semibold">Intel</span> en colaboración con <span class="text-yellow-400 font-semibold">Apple</span> (primera en implementarlo en Mac en 2011), combina PCIe y DisplayPort en un solo cable. Thunderbolt 5 alcanza 80 Gbps, el mismo rendimiento que USB4 v2.
-                    </p>
-                    <p class="text-slate-300 text-xs mb-2">
-                      <strong>Apple y Thunderbolt:</strong> Apple sigue siendo muy "celosa" con Thunderbolt. En los MacBook Pro con <span class="text-yellow-400 font-semibold">M5 Pro y M5 Max (2026)</span> implementa Thunderbolt 5 con controladores propios integrados en el chip, ofreciendo una de las versiones más potentes y estables del mercado (soporte para más monitores externos, mejor ancho de banda por puerto). Los modelos base (como MacBook Air M5) siguen en Thunderbolt 4 / USB4 de 40 Gbps.
-                    </p>
-                    <p class="text-slate-400 text-xs">
-                      <strong>Importancia:</strong> En 2026, USB4 v2 alcanza <span class="text-green-400 font-bold">80 Gbps</span>, rivalizando con PCIe en velocidad pero manteniendo la facilidad de uso hot-plug (conectar sin apagar el equipo).
-                    </p>
-                  </div>
-                  <div class="relative inline-block group cursor-pointer flex-shrink-0 self-start" title="Ver gráfico de velocidades" onclick="abrirImagen('img/USB.jpg')">
-                    <i class="fas fa-eye text-slate-400 text-xl hover:text-cyan-400 transition"></i>
-                    <div class="absolute z-[999] hidden group-hover:block right-0 mt-2 w-[500px] p-2 bg-slate-900 rounded-lg border border-cyan-500 shadow-lg shadow-cyan-500/30 pointer-events-none">
-                      <img src="img/USB.jpg" alt="USB" class="w-full max-h-64 object-contain rounded">
-                    </div>
-                  </div>
-                </div>
-              </div>
+                 <div class="flex gap-4 items-start">
+                   <div class="flex-1">
+                     <p class="text-slate-300 text-sm mb-2">
+                       <strong>USB (Universal Serial Bus)</strong> es el estándar de conectividad más utilizado para conectar periféricos externos a una computadora. 
+                       Fue creado para simplificar la conexión de dispositivos como teclados, mouse, impresoras, discos externos y cargadores.
+                     </p>
+                     <p class="text-slate-300 text-xs mb-2">
+                       <strong>Thunderbolt:</strong> Desarrollado inicialmente por <span class="text-yellow-400 font-semibold">Intel</span> en colaboración con <span class="text-yellow-400 font-semibold">Apple</span> (primera en implementarlo en Mac en 2011), combina PCIe y DisplayPort en un solo cable. Thunderbolt 5 alcanza 80 Gbps, el mismo rendimiento que USB4 v2.
+                     </p>
+                     <p class="text-slate-300 text-xs mb-2">
+                       <strong>Apple y Thunderbolt:</strong> Apple sigue siendo muy "celosa" con Thunderbolt. En los MacBook Pro con <span class="text-yellow-400 font-semibold">M5 Pro y M5 Max (2026)</span> implementa Thunderbolt 5 con controladores propios integrados en el chip, ofreciendo una de las versiones más potentes y estables del mercado (soporte para más monitores externos, mejor ancho de banda por puerto). Los modelos base (como MacBook Air M5) siguen en Thunderbolt 4 / USB4 de 40 Gbps.
+                     </p>
+                     <p class="text-slate-400 text-xs">
+                       <strong>Importancia:</strong> En 2026, USB4 v2 alcanza <span class="text-green-400 font-bold">80 Gbps</span>, rivalizando con PCIe en velocidad pero manteniendo la facilidad de uso hot-plug (conectar sin apagar el equipo).
+                     </p>
+                   </div>
+                   <div class="flex flex-col gap-2">
+                      <div class="relative group cursor-pointer" title="Ver gráfico de velocidades USB" onclick="abrirImagen('img/USB.jpg')">
+                        <i class="fas fa-eye text-slate-400 text-xl hover:text-cyan-400 transition"></i>
+                        <div class="absolute z-[999] hidden group-hover:block right-0 mt-2 w-[500px] p-2 bg-slate-900 rounded-lg border border-cyan-500 shadow-lg shadow-cyan-500/30 pointer-events-none">
+                          <img src="img/USB.jpg" alt="USB" class="w-full max-h-64 object-contain rounded">
+                        </div>
+                      </div>
 
+                      <div class="relative group cursor-pointer" title="Ver comparación Thunderbolt vs USB-C" onclick="abrirImagen('img/thunderbolt-vs-usb-c-cover-635x400.jpg')">
+                        <i class="fas fa-eye text-slate-400 text-xl hover:text-cyan-400 transition"></i>
+                        <div class="absolute z-[999] hidden group-hover:block right-0 mt-2 w-[500px] p-2 bg-slate-900 rounded-lg border border-cyan-500 shadow-lg shadow-cyan-500/30 pointer-events-none">
+                          <img src="img/thunderbolt-vs-usb-c-cover-635x400.jpg" alt="Thunderbolt vs USB-C" class="w-full max-h-64 object-contain rounded">
+                        </div>
+                      </div>
+                    </div>
+                 </div>
+                     </div>
               <!-- Introducción: ¿Qué es CXL? -->
               <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-600 mb-6">
                 <h3 class="text-lg font-semibold text-purple-400 mb-2">
@@ -1422,22 +1385,46 @@
 
             </div>
 
-            <!-- Concepto: Ancho de Banda -->
-            <div class="mt-8 bg-gradient-to-r from-blue-900/40 via-purple-900/40 to-blue-900/40 p-6 rounded-xl border border-blue-500/30">
-  
-              <h3 class="text-xl font-semibold text-blue-400 mb-4">
-                <i class="fas fa-tachometer-alt mr-2"></i>¿Qué es el Ancho de Banda en I/O?
-              </h3>
+             <!-- Concepto: Ancho de Banda y Latencia -->
+             <div class="mt-8 bg-gradient-to-r from-blue-900/40 via-purple-900/40 to-blue-900/40 p-6 rounded-xl border border-blue-500/30">
+   
+               <h3 class="text-xl font-semibold text-blue-400 mb-4">
+                 <i class="fas fa-tachometer-alt mr-2"></i>¿Qué son el Ancho de Banda y la Latencia en I/O?
+               </h3>
 
-              <div class="flex gap-4 items-start">
-                
-                <div class="flex-1">
+               <div class="flex gap-4 items-start">
+                 
+                 <div class="flex-1">
 
-                  <p class="text-slate-300 text-sm mb-4">
-                    El <strong>ancho de banda</strong> es la cantidad máxima de datos que pueden transferirse por segundo a través de un bus o canal de comunicación. Se mide en <strong>bits por segundo (bps)</strong> o múltiplos como <strong>GB/s</strong> (gigabytes por segundo).
-                  </p>
+                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                     <!-- Ancho de Banda -->
+                     <div class="bg-slate-800/60 p-4 rounded-lg border border-slate-600">
+                       <h4 class="text-cyan-400 font-semibold mb-2 flex items-center gap-2">
+                         <i class="fas fa-network-wired"></i>Ancho de Banda
+                       </h4>
+                       <p class="text-slate-300 text-sm mb-2">
+                         Cantidad máxima de datos que pueden transferirse por segundo a través de un bus o canal de comunicación. Se mide en <strong>bits por segundo (bps)</strong> o múltiplos como <strong>GB/s</strong> (gigabytes por segundo).
+                       </p>
+                       <p class="text-slate-400 text-xs">
+                         Ejemplo: PCIe 7.0 x16 ofrece hasta 256 GB/s de ancho de banda bidireccional.
+                       </p>
+                     </div>
 
-                  <!-- Analogías -->
+                     <!-- Latencia -->
+                     <div class="bg-slate-800/60 p-4 rounded-lg border border-slate-600">
+                       <h4 class="text-yellow-400 font-semibold mb-2 flex items-center gap-2">
+                         <i class="fas fa-clock"></i>Latencia
+                       </h4>
+                       <p class="text-slate-300 text-sm mb-2">
+                         Tiempo que transcurre desde que se solicita una transferencia de datos hasta que los primeros datos comienzan a llegar. Se mide en <strong>nanosegundos (ns)</strong> o <strong>microsegundos (µs)</strong>.
+                       </p>
+                       <p class="text-slate-400 text-xs">
+                         Baja latencia = respuesta más rápida. Crítica para IA, bases de datos y juegos.
+                       </p>
+                     </div>
+                   </div>
+
+                   <!-- Analogías -->
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
 
                     <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-600">
@@ -1637,73 +1624,6 @@
                   </div>
                 </div>
               </div>
-            </div>
-
-            <!-- Tabla de Tiempos de Transferencia -->
-            <div class="mt-6 bg-slate-800/60 p-4 rounded-xl border border-slate-600">
-              <h4 class="text-base font-semibold text-yellow-400 mb-3 flex items-center gap-2">
-                <i class="fas fa-clock"></i> Tiempo para transferir 1 TB de datos
-              </h4>
-              <div class="overflow-x-auto">
-                <table class="w-full text-xs">
-                  <thead>
-                    <tr class="border-b border-slate-600">
-                      <th class="text-left py-2 px-2 text-slate-400">Tecnología</th>
-                      <th class="text-center py-2 px-2 text-slate-400">Velocidad</th>
-                      <th class="text-center py-2 px-2 text-slate-400">1 TB (teórico)</th>
-                      <th class="text-center py-2 px-2 text-slate-400">1 TB (realista*)</th>
-                      <th class="text-left py-2 px-2 text-slate-400">Mejor uso</th>
-                    </tr>
-                  </thead>
-                  <tbody class="text-slate-300">
-                    <tr class="border-b border-slate-700">
-                      <td class="py-2 px-2 font-semibold text-blue-400">PCIe 5.0 x16</td>
-                      <td class="text-center py-2 px-2">64 GB/s</td>
-                      <td class="text-center py-2 px-2 text-green-400">~16 s</td>
-                      <td class="text-center py-2 px-2 text-yellow-400">~19 s</td>
-                      <td class="py-2 px-2 text-slate-400">GPU, NVMe Gen5</td>
-                    </tr>
-                    <tr class="border-b border-slate-700">
-                      <td class="py-2 px-2 font-semibold text-cyan-400">PCIe 6.0 x16</td>
-                      <td class="text-center py-2 px-2">128 GB/s</td>
-                      <td class="text-center py-2 px-2 text-green-400">~8 s</td>
-                      <td class="text-center py-2 px-2 text-yellow-400">~9 s</td>
-                      <td class="py-2 px-2 text-slate-400">IA, HPC</td>
-                    </tr>
-                    <tr class="border-b border-slate-700">
-                      <td class="py-2 px-2 font-semibold text-yellow-400">PCIe 7.0 x16</td>
-                      <td class="text-center py-2 px-2">256 GB/s</td>
-                      <td class="text-center py-2 px-2 text-green-400">~4 s</td>
-                      <td class="text-center py-2 px-2 text-yellow-400">~5 s</td>
-                      <td class="py-2 px-2 text-slate-400">IA avanzada</td>
-                    </tr>
-                    <tr class="border-b border-slate-700">
-                      <td class="py-2 px-2 font-semibold text-purple-400">CXL 3.1 x16</td>
-                      <td class="text-center py-2 px-2">128 GB/s</td>
-                      <td class="text-center py-2 px-2 text-green-400">~8 s</td>
-                      <td class="text-center py-2 px-2 text-yellow-400">~9 s</td>
-                      <td class="py-2 px-2 text-slate-400">Memoria compartida</td>
-                    </tr>
-                    <tr class="border-b border-slate-700">
-                      <td class="py-2 px-2 font-semibold text-green-400">USB4 v2</td>
-                      <td class="text-center py-2 px-2">80 Gbps</td>
-                      <td class="text-center py-2 px-2 text-orange-400">~100 s</td>
-                      <td class="text-center py-2 px-2 text-orange-400">~120 s</td>
-                      <td class="py-2 px-2 text-slate-400">Periféricos externos</td>
-                    </tr>
-                    <tr>
-                      <td class="py-2 px-2 font-semibold text-slate-400">USB 3.2 Gen2x2</td>
-                      <td class="text-center py-2 px-2">20 Gbps</td>
-                      <td class="text-center py-2 px-2 text-red-400">~400 s</td>
-                      <td class="text-center py-2 px-2 text-red-400">~480 s</td>
-                      <td class="py-2 px-2 text-slate-400">Discos externos</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <p class="text-[10px] text-slate-500 mt-2">
-                * Valores realistas incorporan ~20% overhead de protocolo y verificación de errores. Los valores de PCIe son bidireccionales (x16). USB tiene mayor overhead por serialización.
-              </p>
             </div>
 
             <!-- 2. Simulador Interactivo de Velocidad PCIe -->
@@ -2052,7 +1972,7 @@
               </p>
             </div>
           </div>
-        </div>
+          </div>
           <div class="mt-8 flex justify-between">
             <button class="text-slate-400 hover:text-white transition" onclick="navegarA('buses')"><i class="fas fa-arrow-left mr-2"></i> Anterior</button>
             <button class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded font-semibold transition" onclick="navegarA('quiz')">Siguiente: Quiz <i class="fas fa-arrow-right ml-2"></i></button>
@@ -2273,7 +2193,7 @@
             </div>
 
       </div>
-    </div>
+      </div>
 
   <script src="script.js"></script>
 
